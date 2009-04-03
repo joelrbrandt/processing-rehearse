@@ -34,9 +34,12 @@
 package bsh;
 
 import java.util.Vector;
+import java.awt.Canvas;
 import java.io.*;
 import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
+
+import edu.stanford.hci.processing.ProcessingMethods;
 
 /**
 	The BeanShell script interpreter.
@@ -150,6 +153,8 @@ public class Interpreter
 	/** Control the verbose printing of results for the show() command. */
 	private boolean showResults;
 
+	private Canvas canvas;
+	
 	/* --- End instance data --- */
 
 	/**
@@ -233,6 +238,51 @@ public class Interpreter
 		setConsole( console );
     }
 
+    public Interpreter(ConsoleInterface console, ProcessingMethods methods, Canvas canvas) {
+		parser = new Parser( in );
+		long t1=System.currentTimeMillis();
+        this.in = in;
+        this.out = out;
+        this.err = err;
+        this.interactive = interactive;
+		debug = err;
+		this.parent = parent;
+		if ( parent != null )
+			setStrictJava( parent.getStrictJava() );
+		this.sourceFileInfo = sourceFileInfo;
+
+		BshClassManager bcm = BshClassManager.createClassManager( this );
+        this.globalNameSpace = new NameSpace( bcm, "global");
+        
+        // register methods
+        try {
+	        Method[] methodArray = ProcessingMethods.class.getMethods();
+	        for (Method m : methodArray) {
+	        	globalNameSpace.setMethod(m.getName(), new BshMethod(m, methods));
+	        }
+        } catch (UtilEvalError e) {
+        	System.err.println(e.toString());
+        }
+        
+		// now done in NameSpace automatically when root
+		// The classes which are imported by default
+		//globalNameSpace.loadDefaultImports();
+
+		/* 
+			Create the root "bsh" system object if it doesn't exist.
+		*/
+		if ( ! ( getu("bsh") instanceof bsh.This ) )
+			initRootSystemObject();
+
+		if ( interactive )
+			loadRCFiles();
+
+		long t2=System.currentTimeMillis();
+		if ( Interpreter.DEBUG ) 
+			Interpreter.debug("Time to initialize interpreter: "+(t2-t1));
+
+    }
+    
 	/**
 		Construct a new interactive interpreter attached to the specified 
 		console.

@@ -67,7 +67,7 @@ class BSHMethodInvocation extends SimpleNode
  
 		Name name = nameNode.getName(namespace);
 		Object[] args = getArgsNode().getArguments(callstack, interpreter);
-
+		
 // This try/catch block is replicated is BSHPrimarySuffix... need to
 // factor out common functionality...
 // Move to Reflect?
