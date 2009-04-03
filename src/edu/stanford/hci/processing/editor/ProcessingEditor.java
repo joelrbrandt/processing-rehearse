@@ -1,24 +1,123 @@
 package edu.stanford.hci.processing.editor;
 
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.io.Reader;
+import java.io.StringReader;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JTextArea;
 
-public class ProcessingEditor extends JFrame {
+import edu.stanford.hci.processing.ProcessingMethods;
+
+import bsh.ConsoleInterface;
+import bsh.EvalError;
+import bsh.Interpreter;
+
+public class ProcessingEditor extends JFrame implements ActionListener, ConsoleInterface {
+	JButton runButton;
+	JTextArea textArea;
+	JTextArea output;
+
+	JFrame canvasFrame;
+	Canvas canvas;
+	
+	PrintStream outputStream;
+	
+	Interpreter interpreter;
 
 	public ProcessingEditor() {
 		super();
-		JTextArea textarea = new JTextArea();
-		this.add(textarea);
+		textArea = new JTextArea();
+		textArea.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+
+		setSize(400, 650);
+		getContentPane().add(textArea, BorderLayout.CENTER);
+
+		runButton = new JButton("Run");
+		getContentPane().add(runButton, BorderLayout.NORTH);
+
+		output = new JTextArea();
+		getContentPane().add(output, BorderLayout.SOUTH);
+		output.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+		output.setEditable(false);
+
+		outputStream = new PrintStream(new TextAreaOutputStream());
+		runButton.addActionListener(this);
 	}
-	
+
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		ProcessingEditor editor = new ProcessingEditor();
-		editor.pack();
 		editor.setVisible(true);
 	}
 
+	@Override
+	public void actionPerformed(ActionEvent arg0) {
+		if (arg0.getSource().equals(runButton)) {
+			// clear previous context
+			canvasFrame = new JFrame();
+			canvasFrame.setSize(100, 100);
+			canvas = new Canvas();
+			canvasFrame.add(canvas, BorderLayout.CENTER);
+			canvasFrame.setVisible(true);
+			ProcessingMethods methods = new ProcessingMethods(canvas);
+			
+			interpreter = new Interpreter(this, methods, canvas);
+			String source = textArea.getText();
+			try {	
+				Object obj = interpreter.eval(source);
+				if (obj != null)
+					output.setText(obj.toString());
+				
+			} catch (EvalError e) {
+				output.setText(e.toString());
+			}
+		}
+	}
+
+	@Override
+	public void error(Object o) {
+		getOut().append(o.toString() + "\n");
+	}
+
+	@Override
+	public PrintStream getErr() {
+		return outputStream;
+	}
+
+	@Override
+	public Reader getIn() {
+		return new StringReader("");
+	}
+
+	@Override
+	public PrintStream getOut() {
+		return outputStream;
+	}
+
+	@Override
+	public void print(Object o) {
+		getOut().append(o.toString());
+	}
+
+	@Override
+	public void println(Object o) {
+		getOut().append(o.toString() + "\n");	
+	}
+
+	public class TextAreaOutputStream extends OutputStream {
+		public void write( int b ) throws IOException {
+			System.out.println("TAOS gets call");
+			output.append( String.valueOf( ( char )b ) );
+		}
+	}
 }
