@@ -39,6 +39,7 @@ import java.io.*;
 import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
 
+import edu.stanford.hci.processing.ProcessingCanvas;
 import edu.stanford.hci.processing.ProcessingMethods;
 
 /**
@@ -153,7 +154,7 @@ public class Interpreter
 	/** Control the verbose printing of results for the show() command. */
 	private boolean showResults;
 
-	private Canvas canvas;
+	private ProcessingCanvas canvas;
 	
 	/* --- End instance data --- */
 
@@ -239,12 +240,14 @@ public class Interpreter
     }
 
     /** This is the entry point for the Processing interpreter. */
-    public Interpreter(ConsoleInterface console, ProcessingMethods methods, Canvas canvas) {
+    public Interpreter(ConsoleInterface console, ProcessingMethods methods, ProcessingCanvas canvas) {
 		parser = new Parser( in );
 		long t1=System.currentTimeMillis();
         this.in = console.getIn();
         this.out = console.getOut();
         this.err = console.getErr();
+        
+        this.canvas = canvas;
         
         methods.setErr(err);
         methods.setOut(out);

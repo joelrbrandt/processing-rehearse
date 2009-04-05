@@ -7,25 +7,55 @@ import java.io.*;
 import javax.swing.JFrame;
 
 public class ProcessingMethods {
-	Canvas canvas;
-	JFrame frame;
+	ProcessingCanvas canvas;
 	Reader in;
 	PrintStream out;
 	PrintStream err;
 	
-	public ProcessingMethods (Canvas c, JFrame frame) {
+	Color fillColor = null;
+	
+	public ProcessingMethods (ProcessingCanvas c) {
 		this.canvas = c;
-		this.frame = frame;
 	}
 	
 	public void size(int width, int height) {
 		canvas.setSize(width, height);
-		frame.pack();
+		canvas.setImageSize(width, height);
 	}
 	
 	public void background(int r, int g, int b) {
 		Color c = new Color(r, g, b);
 		canvas.setBackground(c);
+	}
+	
+	public void rect(int x, int y, int width, int height) {
+		if (fillColor == null)
+			canvas.getGraphics().drawRect(x, y, width, height);
+		else
+			canvas.getGraphics().fillRect(x, y, width, height);
+		canvas.repaint();
+	}
+	
+	public void line(int x1, int y1, int x2, int y2) {
+		canvas.getImage().getGraphics().drawLine(x1, y1, x2, y2);
+		canvas.repaint();
+	}
+	
+	public void ellipse(int x, int y, int width, int height) {
+		if (fillColor == null)
+			canvas.getGraphics().drawOval(x, y, width, height);
+		else
+			canvas.getGraphics().fillOval(x, y, width, height);
+		canvas.repaint();
+	}
+	
+	public void fill(int x, int y, int z) {
+		fillColor = new Color(x, y, z);
+		canvas.getGraphics().setColor(fillColor);
+	}
+	
+	public void noFill() {
+		fillColor = null;
 	}
 	
 	public void println(String s) {
