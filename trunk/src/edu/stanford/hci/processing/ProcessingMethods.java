@@ -30,28 +30,28 @@ public class ProcessingMethods {
 	
 	public void rect(int x, int y, int width, int height) {
 		if (fillColor == null)
-			canvas.getGraphics().drawRect(x, y, width, height);
+			canvas.getImageGraphics().drawRect(x, y, width, height);
 		else
-			canvas.getGraphics().fillRect(x, y, width, height);
+			canvas.getImageGraphics().fillRect(x, y, width, height);
 		canvas.repaint();
 	}
 	
 	public void line(int x1, int y1, int x2, int y2) {
-		canvas.getImage().getGraphics().drawLine(x1, y1, x2, y2);
+		canvas.getImageGraphics().drawLine(x1, y1, x2, y2);
 		canvas.repaint();
 	}
 	
 	public void ellipse(int x, int y, int width, int height) {
 		if (fillColor == null)
-			canvas.getGraphics().drawOval(x, y, width, height);
+			canvas.getImageGraphics().drawOval(x, y, width, height);
 		else
-			canvas.getGraphics().fillOval(x, y, width, height);
+			canvas.getImageGraphics().fillOval(x, y, width, height);
 		canvas.repaint();
 	}
 	
 	public void fill(int x, int y, int z) {
 		fillColor = new Color(x, y, z);
-		canvas.getGraphics().setColor(fillColor);
+		canvas.getImageGraphics().setColor(fillColor);
 	}
 	
 	public void noFill() {
