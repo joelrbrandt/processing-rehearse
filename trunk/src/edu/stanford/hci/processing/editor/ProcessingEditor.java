@@ -64,12 +64,20 @@ public class ProcessingEditor extends JFrame implements ActionListener, ConsoleI
 	public void actionPerformed(ActionEvent arg0) {
 		if (arg0.getSource().equals(runButton)) {
 			// clear previous context
+			if (canvasFrame != null)
+				canvasFrame.dispose();
+			
 			canvasFrame = new JFrame();
-			canvasFrame.setSize(100, 100);
+			canvasFrame.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
+			canvasFrame.setBounds(700, 0, 100, 100);
+			
 			canvas = new Canvas();
-			canvasFrame.add(canvas, BorderLayout.CENTER);
+			canvasFrame.getContentPane().add(canvas);
+			canvas.setSize(500,500);
+			canvasFrame.pack();
+			
 			canvasFrame.setVisible(true);
-			ProcessingMethods methods = new ProcessingMethods(canvas);
+			ProcessingMethods methods = new ProcessingMethods(canvas, canvasFrame);
 			
 			interpreter = new Interpreter(this, methods, canvas);
 			String source = textArea.getText();
