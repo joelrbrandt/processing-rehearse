@@ -26,6 +26,7 @@ public class ProcessingEditor extends JFrame implements ActionListener, ConsoleI
 	JTextArea textArea;
 	JTextArea output;
 
+	JFrame canvasFrame;
 	ProcessingCanvas canvas;
 	
 	PrintStream outputStream;
@@ -65,12 +66,21 @@ public class ProcessingEditor extends JFrame implements ActionListener, ConsoleI
 	public void actionPerformed(ActionEvent arg0) {
 		if (arg0.getSource().equals(runButton)) {
 			// clear previous context
-			canvas = new ProcessingCanvas();
-			canvas.setSize(500,500);
+			if (canvasFrame != null)
+				canvasFrame.dispose();
 			
-			canvas.setVisible(true);
+			canvasFrame = new JFrame();
+			canvasFrame.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
+			canvasFrame.setBounds(700, 0, 100, 100);
+			
+			canvas = new ProcessingCanvas();
+			canvasFrame.getContentPane().add(canvas);
+			canvas.setSize(500,500);
 			canvas.setImageSize(500, 500);
-			ProcessingMethods methods = new ProcessingMethods(canvas);
+			canvasFrame.pack();
+			
+			canvasFrame.setVisible(true);
+			ProcessingMethods methods = new ProcessingMethods(canvas, canvasFrame);
 			
 			interpreter = new Interpreter(this, methods, canvas);
 			String source = textArea.getText();
