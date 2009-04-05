@@ -62,7 +62,6 @@ public class ProcessingEditor extends JFrame implements ActionListener, ConsoleI
 		editor.setVisible(true);
 	}
 
-	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		if (arg0.getSource().equals(runButton)) {
 			// clear previous context
@@ -80,7 +79,7 @@ public class ProcessingEditor extends JFrame implements ActionListener, ConsoleI
 			canvasFrame.pack();
 			
 			canvasFrame.setVisible(true);
-			ProcessingMethods methods = new ProcessingMethods(canvas, canvasFrame);
+			ProcessingMethods methods = new ProcessingMethods(canvas);
 			
 			interpreter = new Interpreter(this, methods, canvas);
 			String source = textArea.getText();
@@ -96,32 +95,26 @@ public class ProcessingEditor extends JFrame implements ActionListener, ConsoleI
 		}
 	}
 
-	@Override
 	public void error(Object o) {
 		getOut().append(o.toString() + "\n");
 	}
 
-	@Override
 	public PrintStream getErr() {
 		return outputStream;
 	}
 
-	@Override
 	public Reader getIn() {
 		return new StringReader("");
 	}
 
-	@Override
 	public PrintStream getOut() {
 		return outputStream;
 	}
 
-	@Override
 	public void print(Object o) {
 		getOut().append(o.toString());
 	}
 
-	@Override
 	public void println(Object o) {
 		getOut().append(o.toString() + "\n");	
 	}
