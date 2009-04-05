@@ -81,13 +81,14 @@ public class ProcessingEditor extends JFrame implements ActionListener, ConsoleI
 			
 			interpreter = new Interpreter(this, methods, canvas);
 			String source = textArea.getText();
+			output.setText("");
 			try {	
 				Object obj = interpreter.eval(source);
 				if (obj != null)
-					output.setText(obj.toString());
+					output.append(obj.toString());
 				
 			} catch (EvalError e) {
-				output.setText(e.toString());
+				output.append(e.toString());
 			}
 		}
 	}
