@@ -14,6 +14,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JTextArea;
 
+import edu.stanford.hci.processing.ProcessingCanvas;
 import edu.stanford.hci.processing.ProcessingMethods;
 
 import bsh.ConsoleInterface;
@@ -25,8 +26,7 @@ public class ProcessingEditor extends JFrame implements ActionListener, ConsoleI
 	JTextArea textArea;
 	JTextArea output;
 
-	JFrame canvasFrame;
-	Canvas canvas;
+	ProcessingCanvas canvas;
 	
 	PrintStream outputStream;
 	
@@ -34,6 +34,7 @@ public class ProcessingEditor extends JFrame implements ActionListener, ConsoleI
 
 	public ProcessingEditor() {
 		super();
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		textArea = new JTextArea();
 		textArea.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
@@ -64,20 +65,12 @@ public class ProcessingEditor extends JFrame implements ActionListener, ConsoleI
 	public void actionPerformed(ActionEvent arg0) {
 		if (arg0.getSource().equals(runButton)) {
 			// clear previous context
-			if (canvasFrame != null)
-				canvasFrame.dispose();
-			
-			canvasFrame = new JFrame();
-			canvasFrame.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
-			canvasFrame.setBounds(700, 0, 100, 100);
-			
-			canvas = new Canvas();
-			canvasFrame.getContentPane().add(canvas);
+			canvas = new ProcessingCanvas();
 			canvas.setSize(500,500);
-			canvasFrame.pack();
 			
-			canvasFrame.setVisible(true);
-			ProcessingMethods methods = new ProcessingMethods(canvas, canvasFrame);
+			canvas.setVisible(true);
+			canvas.setImageSize(500, 500);
+			ProcessingMethods methods = new ProcessingMethods(canvas);
 			
 			interpreter = new Interpreter(this, methods, canvas);
 			String source = textArea.getText();
