@@ -238,21 +238,26 @@ public class Interpreter
 		setConsole( console );
     }
 
+    /** This is the entry point for the Processing interpreter. */
     public Interpreter(ConsoleInterface console, ProcessingMethods methods, Canvas canvas) {
 		parser = new Parser( in );
 		long t1=System.currentTimeMillis();
-        this.in = in;
-        this.out = out;
-        this.err = err;
-        this.interactive = interactive;
-		debug = err;
-		this.parent = parent;
-		if ( parent != null )
-			setStrictJava( parent.getStrictJava() );
-		this.sourceFileInfo = sourceFileInfo;
+        this.in = console.getIn();
+        this.out = console.getOut();
+        this.err = console.getErr();
+        
+        methods.setErr(err);
+        methods.setOut(out);
+//        this.interactive = interactive;
+//		debug = err;
+//		this.parent = parent;
+//		if ( parent != null )
+//			setStrictJava( parent.getStrictJava() );
+//		this.sourceFileInfo = sourceFileInfo;
 
 		BshClassManager bcm = BshClassManager.createClassManager( this );
         this.globalNameSpace = new NameSpace( bcm, "global");
+        
         
         // register methods
         try {
