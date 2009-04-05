@@ -56,6 +56,7 @@ public class ProcessingMethods {
 	
 	public void noFill() {
 		fillColor = null;
+		canvas.getImageGraphics().setColor(Color.BLACK);
 	}
 	
 	public void println(String s) {
