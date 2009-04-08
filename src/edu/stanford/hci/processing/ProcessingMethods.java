@@ -2,6 +2,8 @@ package edu.stanford.hci.processing;
 
 import java.awt.Canvas;
 import java.awt.Color;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.io.*;
 
 import javax.swing.JFrame;
@@ -25,7 +27,10 @@ public class ProcessingMethods {
 	
 	public void background(int r, int g, int b) {
 		Color c = new Color(r, g, b);
-		canvas.setBackground(c);
+		canvas.getImageGraphics().setColor(c);
+		BufferedImage image = canvas.getImage();
+		canvas.getImageGraphics().fillRect(0, 0, image.getWidth(), image.getHeight());
+		canvas.getImageGraphics().setColor(ProcessingCanvas.DEFAULT_PEN_COLOR);
 	}
 	
 	public void rect(int x, int y, int width, int height) {
@@ -56,7 +61,7 @@ public class ProcessingMethods {
 	
 	public void noFill() {
 		fillColor = null;
-		canvas.getImageGraphics().setColor(Color.BLACK);
+		canvas.getImageGraphics().setColor(ProcessingCanvas.DEFAULT_PEN_COLOR);
 	}
 	
 	public void println(String s) {

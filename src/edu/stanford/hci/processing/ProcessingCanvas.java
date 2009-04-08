@@ -9,6 +9,9 @@ public class ProcessingCanvas extends Canvas {
 	BufferedImage image;
 	Graphics2D graphics;
 	
+	public static final Color DEFAULT_BACKGROUND_COLOR = Color.white;
+	public static final Color DEFAULT_PEN_COLOR = Color.black;
+	
 	public ProcessingCanvas() {
 	}
 	
@@ -33,8 +36,8 @@ public class ProcessingCanvas extends Canvas {
 		//image = (BufferedImage) this.createImage(width, height);
 		image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		graphics = image.createGraphics();
-		graphics.setPaint(Color.WHITE);
+		graphics.setPaint(DEFAULT_BACKGROUND_COLOR);
 		graphics.fillRect(0, 0, image.getWidth(), image.getHeight());
-		graphics.setPaint(Color.BLACK);
+		graphics.setPaint(DEFAULT_PEN_COLOR);
 	}
 }
