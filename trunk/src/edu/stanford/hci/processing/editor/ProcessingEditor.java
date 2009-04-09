@@ -92,6 +92,11 @@ public class ProcessingEditor extends JFrame implements ActionListener, ConsoleI
 			} catch (EvalError e) {
 				output.append(e.toString());
 			}
+			
+			output.append("\n + Line numbers executed:");
+			for (Integer i : interpreter.getLineNumberSet()) {
+				output.append(" " + i);
+			}
 		}
 	}
 

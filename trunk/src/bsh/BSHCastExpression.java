@@ -48,7 +48,7 @@ class BSHCastExpression extends SimpleNode {
 	/**
 		@return the result of the cast.
 	*/
-	public Object eval(
+	public Object evalNode(
 		CallStack callstack, Interpreter interpreter ) throws EvalError
     {
 		NameSpace namespace = callstack.top();

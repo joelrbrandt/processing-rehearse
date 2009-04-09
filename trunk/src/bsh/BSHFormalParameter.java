@@ -60,7 +60,7 @@ class BSHFormalParameter extends SimpleNode
 	/**
 		Evaluate the type.
 	*/
-	public Object eval( CallStack callstack, Interpreter interpreter) 
+	public Object evalNode( CallStack callstack, Interpreter interpreter) 
 		throws EvalError
 	{
 		if ( jjtGetNumChildren() > 0 )

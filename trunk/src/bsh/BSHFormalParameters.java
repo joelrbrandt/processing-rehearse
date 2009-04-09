@@ -92,7 +92,7 @@ class BSHFormalParameters extends SimpleNode
 		Evaluate the types.  
 		Note that type resolution does not require the interpreter instance.
 	*/
-	public Object eval( CallStack callstack, Interpreter interpreter )  
+	public Object evalNode( CallStack callstack, Interpreter interpreter )  
 		throws EvalError
 	{
 		if ( paramTypes != null )

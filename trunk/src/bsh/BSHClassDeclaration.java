@@ -57,7 +57,7 @@ class BSHClassDeclaration extends SimpleNode
 
 	/**
 	*/
-	public Object eval( CallStack callstack, Interpreter interpreter )
+	public Object evalNode( CallStack callstack, Interpreter interpreter )  
 		throws EvalError
 	{
 		int child = 0;

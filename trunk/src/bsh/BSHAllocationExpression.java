@@ -45,7 +45,7 @@ class BSHAllocationExpression extends SimpleNode
     BSHAllocationExpression(int id) { super(id); }
 	private static int innerClassCount = 0;
 	
-    public Object eval( CallStack callstack, Interpreter interpreter) 
+    public Object evalNode( CallStack callstack, Interpreter interpreter) 
 		throws EvalError
     {
         // type is either a class name or a primitive type

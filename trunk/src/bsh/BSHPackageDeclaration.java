@@ -41,7 +41,7 @@ public class BSHPackageDeclaration extends SimpleNode
     super(id);
   }
 
-	public Object eval( CallStack callstack, Interpreter interpreter )
+	public Object evalNode( CallStack callstack, Interpreter interpreter )  
 		throws EvalError
 	{
 		BSHAmbiguousName name = (BSHAmbiguousName)jjtGetChild(0);
