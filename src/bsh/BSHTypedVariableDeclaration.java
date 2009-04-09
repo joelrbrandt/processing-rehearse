@@ -66,7 +66,7 @@ class BSHTypedVariableDeclaration extends SimpleNode
 		evaluate the type and one or more variable declarators, e.g.:
 			int a, b=5, c;
 	*/
-    public Object eval( CallStack callstack, Interpreter interpreter)  
+    public Object evalNode( CallStack callstack, Interpreter interpreter )  
 		throws EvalError
     {
 		try {

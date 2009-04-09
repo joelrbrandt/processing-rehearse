@@ -43,7 +43,7 @@ class BSHWhileStatement extends SimpleNode implements ParserConstants
 
     BSHWhileStatement(int id) { super(id); }
 
-    public Object eval( CallStack callstack, Interpreter interpreter)  
+    public Object evalNode( CallStack callstack, Interpreter interpreter )  
 		throws EvalError
     {
 		int numChild = jjtGetNumChildren();

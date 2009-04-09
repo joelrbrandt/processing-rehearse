@@ -115,7 +115,7 @@ class BSHMethodDeclaration extends SimpleNode
 		Evaluate the declaration of the method.  That is, determine the
 		structure of the method and install it into the caller's namespace.
 	*/
-	public Object eval( CallStack callstack, Interpreter interpreter )
+	public Object evalNode( CallStack callstack, Interpreter interpreter )  
 		throws EvalError
 	{
 		returnType = evalReturnType( callstack, interpreter );

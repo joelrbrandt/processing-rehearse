@@ -152,10 +152,16 @@ class SimpleNode implements Node
 		jjtSetParent( null );
 	}
 
+	public final Object eval(CallStack callstack, Interpreter interpreter) 
+		throws EvalError {
+		doLog(interpreter);
+		return evalNode(callstack, interpreter);
+	}
+	
 	/**
 		This is the general signature for evaluation of a node.
 	*/
-	public Object eval( CallStack callstack, Interpreter interpreter ) 
+	public Object evalNode( CallStack callstack, Interpreter interpreter ) 
 		throws EvalError
 	{
 		throw new InterpreterError(
@@ -219,6 +225,11 @@ class SimpleNode implements Node
 		}
 			
 		return text.toString();
+	}
+	
+	public void doLog(Interpreter interpreter) {
+		// TODO: Check source?
+		interpreter.getLineNumberSet().add(getLineNumber());
 	}
 }
 

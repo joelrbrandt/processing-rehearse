@@ -33,6 +33,7 @@
 
 package bsh;
 
+import java.util.HashSet;
 import java.util.Vector;
 import java.awt.Canvas;
 import java.io.*;
@@ -155,6 +156,8 @@ public class Interpreter
 	private boolean showResults;
 
 	private ProcessingCanvas canvas;
+	
+	private HashSet<Integer> lineNumbers = new HashSet<Integer>();
 	
 	/* --- End instance data --- */
 
@@ -678,10 +681,11 @@ public class Interpreter
 			with source from the input stream and out/err same as 
 			this interpreter.
 		*/
+		lineNumbers.clear();
         Interpreter localInterpreter = 
 			new Interpreter( 
 				in, out, err, false, nameSpace, this, sourceFileInfo  );
-
+        
 		CallStack callstack = new CallStack( nameSpace );
 
         boolean eof = false;
@@ -775,6 +779,7 @@ public class Interpreter
 				}
             }
         }
+        this.setLineNumberSet(localInterpreter.getLineNumberSet());
 		return Primitive.unwrap( retVal );
     }
 
@@ -1171,6 +1176,14 @@ public class Interpreter
 		return this.strictJava;
 	}
 
+	public void setLineNumberSet(HashSet numbers) {
+		this.lineNumbers = numbers;
+	}
+	
+	public HashSet<Integer> getLineNumberSet() {
+		return lineNumbers;
+	}
+	
 	static void staticInit() 
 	{
 	/* 

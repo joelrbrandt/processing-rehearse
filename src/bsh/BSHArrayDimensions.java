@@ -78,7 +78,7 @@ class BSHArrayDimensions extends SimpleNode
 
 		The structure of the array dims is maintained in dimensions.
 	*/
-    public Object eval( CallStack callstack, Interpreter interpreter )  
+    public Object evalNode( CallStack callstack, Interpreter interpreter )  
 		throws EvalError
     {
 		SimpleNode child = (SimpleNode)jjtGetChild(0);

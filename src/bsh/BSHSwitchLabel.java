@@ -38,7 +38,7 @@ class BSHSwitchLabel extends SimpleNode {
 
 	public BSHSwitchLabel(int id) { super(id); }
 
-	public Object eval(
+	public Object evalNode(
 		CallStack callstack, Interpreter interpreter) throws EvalError
 	{
 		if ( isDefault )

@@ -52,7 +52,7 @@ class BSHMethodInvocation extends SimpleNode
 		Evaluate the method invocation with the specified callstack and 
 		interpreter
 	*/
-	public Object eval( CallStack callstack, Interpreter interpreter )
+	public Object evalNode( CallStack callstack, Interpreter interpreter )  
 		throws EvalError
 	{
 		NameSpace namespace = callstack.top();
