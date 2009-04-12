@@ -12,6 +12,8 @@ import java.io.StringReader;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
 import edu.stanford.hci.processing.ExecutionTask;
@@ -24,8 +26,10 @@ import bsh.Interpreter;
 
 public class ProcessingEditor extends JFrame implements ActionListener, ConsoleInterface {
 	JButton runButton;
+	JButton resumeButton;
 	JTextArea textArea;
 	JTextArea output;
+	JTextArea breakpoints;
 
 	JFrame canvasFrame;
 	ProcessingCanvas canvas;
@@ -43,16 +47,32 @@ public class ProcessingEditor extends JFrame implements ActionListener, ConsoleI
 		setSize(400, 650);
 		getContentPane().add(textArea, BorderLayout.CENTER);
 
+		JPanel buttonPanel = new JPanel();
 		runButton = new JButton("Run");
-		getContentPane().add(runButton, BorderLayout.NORTH);
-
+		buttonPanel.add(runButton);
+		resumeButton = new JButton("Resume");
+		buttonPanel.add(resumeButton);
+		runButton.addActionListener(this);
+		resumeButton.addActionListener(this);
+		getContentPane().add(buttonPanel, BorderLayout.NORTH);
+		
+		GridLayout gridLayout = new GridLayout(0, 1);
+		JPanel textPanel = new JPanel();
+		textPanel.setLayout(gridLayout);
 		output = new JTextArea();
-		getContentPane().add(output, BorderLayout.SOUTH);
+		breakpoints = new JTextArea();
+		textPanel.add(new JLabel("Console output:"));
+		textPanel.add(output);
+		textPanel.add(new JLabel("Breakpoints (space seperated):"));
+		textPanel.add(breakpoints);
 		output.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		output.setEditable(false);
-
+		breakpoints.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+		getContentPane().add(textPanel, BorderLayout.SOUTH);
+//		getContentPane().add(output, BorderLayout.SOUTH);
 		outputStream = new PrintStream(new TextAreaOutputStream());
-		runButton.addActionListener(this);
+		
+		resumeButton.setEnabled(false);
 		
 		textArea.setText("rect(100, 100, 100, 100)");
 	}
@@ -67,31 +87,52 @@ public class ProcessingEditor extends JFrame implements ActionListener, ConsoleI
 
 	public void actionPerformed(ActionEvent arg0) {
 		if (arg0.getSource().equals(runButton)) {
-			// clear previous context
-			if (canvasFrame != null)
-				canvasFrame.dispose();
-			
-			canvasFrame = new JFrame();
-			canvasFrame.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
-			canvasFrame.setBounds(700, 0, 100, 100);
-			
-			canvas = new ProcessingCanvas();
-			canvasFrame.getContentPane().add(canvas);
-			canvas.setSize(500,500);
-			canvas.setImageSize(500, 500);
-			canvasFrame.pack();
-			
-			canvasFrame.setVisible(true);
-			ProcessingMethods methods = new ProcessingMethods(canvas);
-			
-			interpreter = new Interpreter(this, methods, canvas);
-			String source = textArea.getText();
-			ExecutionTask task = new ExecutionTask(interpreter, source, output);
-			Thread thread = new Thread(task);
-			thread.start();
+			doRun();
+		} else if (arg0.getSource().equals(resumeButton)) {
+			doResume();
 		}
 	}
 
+	// runs the processing script
+	private void doRun() {
+		// clear previous context
+		if (canvasFrame != null)
+			canvasFrame.dispose();
+		
+		canvasFrame = new JFrame();
+		canvasFrame.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
+		canvasFrame.setBounds(700, 0, 100, 100);
+		
+		canvas = new ProcessingCanvas();
+		canvasFrame.getContentPane().add(canvas);
+		canvas.setSize(500,500);
+		canvas.setImageSize(500, 500);
+		canvasFrame.pack();
+		
+		canvasFrame.setVisible(true);
+		ProcessingMethods methods = new ProcessingMethods(canvas);
+		
+		interpreter = new Interpreter(this, methods, canvas);
+		
+		String[] breakpointArray = breakpoints.getText().split(" ");
+		for (String str : breakpointArray) {
+			Integer i = Integer.parseInt(str);
+			interpreter.setBreakpoint(i);
+		}
+		resumeButton.setEnabled(false);
+		String source = textArea.getText();
+		ExecutionTask task = new ExecutionTask(interpreter, source, output);
+		Thread thread = new Thread(task);
+		thread.start();
+	}
+
+	private void doResume() {
+		synchronized (interpreter.getBreakpointLock()) {
+			interpreter.setSuspended(false);
+			interpreter.getBreakpointLock().notify();
+		}
+	}
+	
 	public void error(Object o) {
 		getOut().append(o.toString() + "\n");
 	}
@@ -121,5 +162,9 @@ public class ProcessingEditor extends JFrame implements ActionListener, ConsoleI
 			System.out.println("TAOS gets call");
 			output.append( String.valueOf( ( char )b ) );
 		}
+	}
+	
+	public void setResumable(boolean resumable) {
+		resumeButton.setEnabled(resumable);
 	}
 }

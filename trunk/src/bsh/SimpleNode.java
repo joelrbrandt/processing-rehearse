@@ -155,18 +155,27 @@ class SimpleNode implements Node
 	public final Object eval(CallStack callstack, Interpreter interpreter) 
 		throws EvalError {
 		doLog(interpreter);
-//		if (interpreter.getLineNumberSet().contains(getLineNumber()))
-//			interpreter.suspend();
-//		
-//		synchronized(interpreter.getBreakpointLock()) {
-//			try {
-//				while (interpreter.isSuspended()) {
-//					interpreter.getBreakpointLock().wait();
-//				} 
-//			} catch (InterruptedException e) {
-//				throw new RuntimeException("Very unexpected interruption.");
-//			}
-//		}
+		
+		// Don't break if we just executed another node on this line
+		// (Avoids breaking multiple times in one run through a line)
+		if (getLineNumber() != interpreter.getLastExecutedLine()
+			&& interpreter.isBreakpointAt(getLineNumber())) {
+			interpreter.setSuspended(true);
+		}
+		
+		// TODO: Technically there is a possibility for concurrency issues
+		// if the user hits the Resume button somewhere here.
+		
+		interpreter.setLastExecutedLine(getLineNumber());
+		synchronized(interpreter.getBreakpointLock()) {
+			try {
+				while (interpreter.isSuspended()) {
+					interpreter.getBreakpointLock().wait();
+				} 
+			} catch (InterruptedException e) {
+				throw new RuntimeException("Very unexpected interruption.");
+			}
+		}
 		
 		return evalNode(callstack, interpreter);
 	}
