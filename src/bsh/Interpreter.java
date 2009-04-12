@@ -42,6 +42,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import edu.stanford.hci.processing.ProcessingCanvas;
 import edu.stanford.hci.processing.ProcessingMethods;
+import edu.stanford.hci.processing.editor.ProcessingEditor;
 
 /**
 	The BeanShell script interpreter.
@@ -156,10 +157,14 @@ public class Interpreter
 	private boolean showResults;
 
 	private ProcessingCanvas canvas;
+	private ProcessingEditor editor;
 	
 	private HashSet<Integer> lineNumbers = new HashSet<Integer>();
 	private HashSet<Integer> breakpointLineNumbers = new HashSet<Integer>();
 	private Object breakpointLock = new Object();
+	private int lastExecutedLine = -1;
+
+	private boolean suspended = false;
 	
 	/* --- End instance data --- */
 
@@ -245,12 +250,13 @@ public class Interpreter
     }
 
     /** This is the entry point for the Processing interpreter. */
-    public Interpreter(ConsoleInterface console, ProcessingMethods methods, ProcessingCanvas canvas) {
+    public Interpreter(ProcessingEditor console, ProcessingMethods methods, ProcessingCanvas canvas) {
 		parser = new Parser( in );
 		long t1=System.currentTimeMillis();
         this.in = null;
         this.out = console.getOut();
         this.err = console.getErr();
+        this.editor = console;
         
         this.canvas = canvas;
         
@@ -678,11 +684,6 @@ public class Interpreter
 		if ( Interpreter.DEBUG ) debug("eval: nameSpace = "+nameSpace);
 		this.in = in;
 		parser = new Parser(in);
-		/* 
-			Create non-interactive local interpreter for this namespace
-			with source from the input stream and out/err same as 
-			this interpreter.
-		*/
 		lineNumbers.clear();
 		CallStack callstack = new CallStack( nameSpace );
 		
@@ -709,8 +710,8 @@ public class Interpreter
 
 					if ( TRACE )
 						println( "// " +node.getText() );
-
 					
+					// eval
 					retVal = node.eval( callstack, this );
                     
 					// sanity check during development
@@ -1318,7 +1319,7 @@ public class Interpreter
 	}
 	
 	public boolean isBreakpointAt(int linenumber) {
-		return false;
+		return breakpointLineNumbers.contains(linenumber);
 	}
 	
 	public Object getBreakpointLock() {
@@ -1339,6 +1340,23 @@ public class Interpreter
 	
 	public void setBreakpointSet(HashSet<Integer> breakpoints) {
 		this.breakpointLineNumbers = breakpoints;
+	}
+	
+	public boolean isSuspended() {
+		return suspended;
+	}
+	
+	public void setSuspended(boolean suspended) {
+		this.suspended = suspended;
+		editor.setResumable(suspended);
+	}
+
+	public int getLastExecutedLine() {
+		return lastExecutedLine;
+	}
+
+	public void setLastExecutedLine(int lastExecutedLine) {
+		this.lastExecutedLine = lastExecutedLine;
 	}
 }
 
