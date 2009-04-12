@@ -10,6 +10,7 @@ import java.io.Reader;
 import java.io.StringReader;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -56,9 +57,9 @@ public class ProcessingEditor extends JFrame implements ActionListener, ConsoleI
 		resumeButton.addActionListener(this);
 		getContentPane().add(buttonPanel, BorderLayout.NORTH);
 		
-		GridLayout gridLayout = new GridLayout(0, 1);
 		JPanel textPanel = new JPanel();
-		textPanel.setLayout(gridLayout);
+		textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.PAGE_AXIS));
+		
 		output = new JTextArea();
 		breakpoints = new JTextArea();
 		textPanel.add(new JLabel("Console output:"));
@@ -116,8 +117,12 @@ public class ProcessingEditor extends JFrame implements ActionListener, ConsoleI
 		
 		String[] breakpointArray = breakpoints.getText().split(" ");
 		for (String str : breakpointArray) {
-			Integer i = Integer.parseInt(str);
-			interpreter.setBreakpoint(i);
+			try {
+				Integer i = Integer.parseInt(str);
+				interpreter.setBreakpoint(i);
+			} catch( NumberFormatException e) {
+				System.out.println("Breakpoint line was not formatted correctly.");
+			}
 		}
 		resumeButton.setEnabled(false);
 		String source = textArea.getText();
