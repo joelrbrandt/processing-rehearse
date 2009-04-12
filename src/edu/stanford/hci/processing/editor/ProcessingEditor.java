@@ -14,6 +14,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JTextArea;
 
+import edu.stanford.hci.processing.ExecutionTask;
 import edu.stanford.hci.processing.ProcessingCanvas;
 import edu.stanford.hci.processing.ProcessingMethods;
 
@@ -52,6 +53,8 @@ public class ProcessingEditor extends JFrame implements ActionListener, ConsoleI
 
 		outputStream = new PrintStream(new TextAreaOutputStream());
 		runButton.addActionListener(this);
+		
+		textArea.setText("rect(100, 100, 100, 100)");
 	}
 
 	/**
@@ -83,20 +86,9 @@ public class ProcessingEditor extends JFrame implements ActionListener, ConsoleI
 			
 			interpreter = new Interpreter(this, methods, canvas);
 			String source = textArea.getText();
-			output.setText("");
-			try {	
-				Object obj = interpreter.eval(source);
-				if (obj != null)
-					output.append(obj.toString());
-				
-			} catch (EvalError e) {
-				output.append(e.toString());
-			}
-			
-			output.append("\n + Line numbers executed:");
-			for (Integer i : interpreter.getLineNumberSet()) {
-				output.append(" " + i);
-			}
+			ExecutionTask task = new ExecutionTask(interpreter, source, output);
+			Thread thread = new Thread(task);
+			thread.start();
 		}
 	}
 

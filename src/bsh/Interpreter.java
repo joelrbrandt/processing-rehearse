@@ -158,6 +158,8 @@ public class Interpreter
 	private ProcessingCanvas canvas;
 	
 	private HashSet<Integer> lineNumbers = new HashSet<Integer>();
+	private HashSet<Integer> breakpointLineNumbers = new HashSet<Integer>();
+	private Object breakpointLock = new Object();
 	
 	/* --- End instance data --- */
 
@@ -246,7 +248,7 @@ public class Interpreter
     public Interpreter(ConsoleInterface console, ProcessingMethods methods, ProcessingCanvas canvas) {
 		parser = new Parser( in );
 		long t1=System.currentTimeMillis();
-        this.in = console.getIn();
+        this.in = null;
         this.out = console.getOut();
         this.err = console.getErr();
         
@@ -254,12 +256,11 @@ public class Interpreter
         
         methods.setErr(err);
         methods.setOut(out);
-//        this.interactive = interactive;
-//		debug = err;
-//		this.parent = parent;
-//		if ( parent != null )
-//			setStrictJava( parent.getStrictJava() );
-//		this.sourceFileInfo = sourceFileInfo;
+        this.interactive = false;
+		debug = err;
+		this.parent = null;
+		if ( parent != null )
+			setStrictJava( parent.getStrictJava() );
 
 		BshClassManager bcm = BshClassManager.createClassManager( this );
         this.globalNameSpace = new NameSpace( bcm, "global");
@@ -675,29 +676,26 @@ public class Interpreter
 	{
 		Object retVal = null;
 		if ( Interpreter.DEBUG ) debug("eval: nameSpace = "+nameSpace);
-
+		this.in = in;
+		parser = new Parser(in);
 		/* 
 			Create non-interactive local interpreter for this namespace
 			with source from the input stream and out/err same as 
 			this interpreter.
 		*/
 		lineNumbers.clear();
-        Interpreter localInterpreter = 
-			new Interpreter( 
-				in, out, err, false, nameSpace, this, sourceFileInfo  );
-        
 		CallStack callstack = new CallStack( nameSpace );
-
+		
         boolean eof = false;
         while(!eof)
         {
 			SimpleNode node = null;
             try
             {
-                eof = localInterpreter.Line();
-                if (localInterpreter.get_jjtree().nodeArity() > 0)
+                eof = Line();
+                if (get_jjtree().nodeArity() > 0)
                 {
-                    node = (SimpleNode)localInterpreter.get_jjtree().rootNode();
+                    node = (SimpleNode)get_jjtree().rootNode();
 					// quick filter for when we're running as a compiler only
 					if ( getSaveClasses()
 						&& !(node instanceof BSHClassDeclaration)
@@ -712,8 +710,9 @@ public class Interpreter
 					if ( TRACE )
 						println( "// " +node.getText() );
 
-                    retVal = node.eval( callstack, localInterpreter );
-
+					
+					retVal = node.eval( callstack, this );
+                    
 					// sanity check during development
 					if ( callstack.depth() > 1 )
 						throw new InterpreterError(
@@ -724,7 +723,7 @@ public class Interpreter
 						break; // non-interactive, return control now
 					}
 
-					if ( localInterpreter.showResults 
+					if ( this.showResults 
 						&& retVal != Primitive.VOID )
 						println("<" + retVal + ">");
                 }
@@ -760,7 +759,7 @@ public class Interpreter
 					e.setNode( node );
 				e.reThrow( "Sourced file: "+sourceFileInfo );
             } catch ( Exception e) {
-                if ( DEBUG)
+                if ( true)
                 	e.printStackTrace();
                 throw new EvalError(
 					"Sourced file: "+sourceFileInfo+" unknown error: " 
@@ -770,7 +769,7 @@ public class Interpreter
 					"Sourced file: "+sourceFileInfo+" Token Parsing Error: " 
 					+ e.getMessage(), node, callstack );
             } finally {
-                localInterpreter.get_jjtree().reset();
+                this.get_jjtree().reset();
 
 				// reinit the callstack
 				if ( callstack.depth() > 1 ) {
@@ -779,7 +778,6 @@ public class Interpreter
 				}
             }
         }
-        this.setLineNumberSet(localInterpreter.getLineNumberSet());
 		return Primitive.unwrap( retVal );
     }
 
@@ -1317,6 +1315,30 @@ public class Interpreter
 
 	public static boolean getSaveClasses()  {
 		return getSaveClassesDir() != null;
+	}
+	
+	public boolean isBreakpointAt(int linenumber) {
+		return false;
+	}
+	
+	public Object getBreakpointLock() {
+		return breakpointLock;
+	}
+	
+	public void setBreakpoint(int breakpoint) {
+		breakpointLineNumbers.add(breakpoint);
+	}
+	
+	public void clearBreakpoints() {
+		breakpointLineNumbers.clear();
+	}
+	
+	public void removeBreakpoint(int breakpoint) {
+		breakpointLineNumbers.remove(breakpoint);
+	}
+	
+	public void setBreakpointSet(HashSet<Integer> breakpoints) {
+		this.breakpointLineNumbers = breakpoints;
 	}
 }
 

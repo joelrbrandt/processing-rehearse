@@ -70,7 +70,7 @@ class SimpleNode implements Node
 	protected Node[] children;
 	protected int id;
 	Token firstToken, lastToken;
-
+	
 	/** the source of the text from which this was parsed */
 	String sourceFile;
 
@@ -155,6 +155,19 @@ class SimpleNode implements Node
 	public final Object eval(CallStack callstack, Interpreter interpreter) 
 		throws EvalError {
 		doLog(interpreter);
+//		if (interpreter.getLineNumberSet().contains(getLineNumber()))
+//			interpreter.suspend();
+//		
+//		synchronized(interpreter.getBreakpointLock()) {
+//			try {
+//				while (interpreter.isSuspended()) {
+//					interpreter.getBreakpointLock().wait();
+//				} 
+//			} catch (InterruptedException e) {
+//				throw new RuntimeException("Very unexpected interruption.");
+//			}
+//		}
+		
 		return evalNode(callstack, interpreter);
 	}
 	
