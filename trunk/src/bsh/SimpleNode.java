@@ -33,6 +33,9 @@
 
 
 package bsh;
+
+import java.awt.image.BufferedImage;
+
 /*
 	Note: great care (and lots of typing) were taken to insure that the
 	namespace and interpreter references are passed on the stack and not 
@@ -186,6 +189,7 @@ class SimpleNode implements Node
 	public Object evalNode( CallStack callstack, Interpreter interpreter ) 
 		throws EvalError
 	{
+		BufferedImage im;
 		throw new InterpreterError(
 			"Unimplemented or inappropriate for " + getClass().getName() );
 	}
