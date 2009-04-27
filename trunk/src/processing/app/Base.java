@@ -266,7 +266,7 @@ public class Base {
   }
 
 
-  static protected void initPlatform() {
+  public static void initPlatform() {
     try {
       Class platformClass = Class.forName("processing.app.Platform");
       if (Base.isMacOS()) {
