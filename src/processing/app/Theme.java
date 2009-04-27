@@ -44,7 +44,7 @@ public class Theme {
   static Hashtable table = new Hashtable();;
 
 
-  static protected void init() {
+  static public void init() {
     try {
       load(Base.getLibStream("theme/theme.txt"));
     } catch (Exception te) {

@@ -17,6 +17,17 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
+import processing.app.Base;
+import processing.app.EditorListener;
+import processing.app.Preferences;
+import processing.app.RehearseEditorListener;
+import processing.app.Theme;
+import processing.app.syntax.JEditTextArea;
+import processing.app.syntax.PdeKeywords;
+import processing.app.syntax.PdeTextAreaDefaults;
+import processing.app.syntax.RehearseTextAreaDefaults;
+import processing.app.syntax.TextAreaDefaults;
+
 import edu.stanford.hci.processing.ExecutionTask;
 import edu.stanford.hci.processing.ProcessingCanvas;
 import edu.stanford.hci.processing.ProcessingMethods;
@@ -28,7 +39,7 @@ import bsh.Interpreter;
 public class ProcessingEditor extends JFrame implements ActionListener, ConsoleInterface {
 	JButton runButton;
 	JButton resumeButton;
-	JTextArea textArea;
+	JEditTextArea textArea;
 	JTextArea output;
 	JTextArea breakpoints;
 
@@ -42,8 +53,12 @@ public class ProcessingEditor extends JFrame implements ActionListener, ConsoleI
 	public ProcessingEditor() {
 		super();
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		textArea = new JTextArea();
+		
+		textArea = new JEditTextArea(new RehearseTextAreaDefaults());
 		textArea.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+		RehearseEditorListener listener = new RehearseEditorListener(this, textArea);
+		listener.applyPreferences();
+		textArea.getDocument().setTokenMarker(new PdeKeywords());
 
 		setSize(400, 650);
 		getContentPane().add(textArea, BorderLayout.CENTER);
