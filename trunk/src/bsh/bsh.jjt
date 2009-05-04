@@ -260,6 +260,7 @@ TOKEN : /* RESERVED WORDS AND LITERALS */
 | < IMPORT: "import" >
 | < INSTANCEOF: "instanceof" >
 | < INT: "int" >
+| < COLOR: "color" >
 | < INTERFACE: "interface" >
 | < LONG: "long" >
 | < NATIVE: "native" >
@@ -291,6 +292,7 @@ TOKEN : /* LITERALS */
         <DECIMAL_LITERAL> (["l","L"])?
       | <HEX_LITERAL> (["l","L"])?
       | <OCTAL_LITERAL> (["l","L"])?
+      | <WEBCOLOR_LITERAL>
   >
 |
   < #DECIMAL_LITERAL: ["1"-"9"] (["0"-"9"])* >
@@ -298,6 +300,8 @@ TOKEN : /* LITERALS */
   < #HEX_LITERAL: "0" ["x","X"] (["0"-"9","a"-"f","A"-"F"])+ >
 |
   < #OCTAL_LITERAL: "0" (["0"-"7"])* >
+|
+  < #WEBCOLOR_LITERAL: "#" ["0"-"9","a"-"f","A"-"F"] ["0"-"9","a"-"f","A"-"F"] ["0"-"9","a"-"f","A"-"F"] ["0"-"9","a"-"f","A"-"F"] ["0"-"9","a"-"f","A"-"F"] ["0"-"9","a"-"f","A"-"F"] >
 |
   < FLOATING_POINT_LITERAL:
         (["0"-"9"])+ "." (["0"-"9"])* (<EXPONENT>)? (["f","F","d","D"])?
@@ -658,6 +662,7 @@ void PrimitiveType() #PrimitiveType :
 | "byte" { jjtThis.type =  Byte.TYPE; }
 | "short" { jjtThis.type =  Short.TYPE; }
 | "int" { jjtThis.type =  Integer.TYPE; }
+| "color" { jjtThis.type =  Integer.TYPE; }
 | "long" { jjtThis.type =  Long.TYPE; }
 | "float" { jjtThis.type =  Float.TYPE; }
 | "double" { jjtThis.type =  Double.TYPE; }
@@ -904,6 +909,23 @@ void PrimaryExpression() #PrimaryExpression : { }
   PrimaryPrefix() ( PrimarySuffix() )*
 }
 
+void ConstructorCastExpression() #ConstructorCastExpression : { }
+{
+  "boolean" Arguments() { jjtThis.castToType = Boolean.TYPE; } // according to processing, you can't cast a string literal to a boolean. but you can cast the result of a method that returns a string to a boolean. this is inconsistent. so who cares? processing is broke'd.
+| "char" Arguments() { jjtThis.castToType =  Character.TYPE; }
+| "byte" Arguments() { jjtThis.castToType =  Byte.TYPE; }
+| "short" Arguments() { jjtThis.castToType =  Short.TYPE; }
+| "int" Arguments() { jjtThis.castToType =  Integer.TYPE; }
+| "long" Arguments() { jjtThis.castToType =  Long.TYPE; }
+| "float" Arguments() { jjtThis.castToType =  Float.TYPE; }
+| "double" Arguments() { jjtThis.castToType =  Double.TYPE; }
+}
+
+void ColorMethodInvocation() #ColorMethodInvocation : { }
+{
+   "color" Arguments()
+}
+
 void MethodInvocation() #MethodInvocation : { }
 {
    AmbiguousName() Arguments()
@@ -916,6 +938,14 @@ void PrimaryPrefix() : { }
   "(" Expression() ")"
 |
   AllocationExpression()
+|
+  // SYNTACTIC_LOOKAHEAD
+  LOOKAHEAD( ConstructorCastExpression() )
+	ConstructorCastExpression()
+|
+  // SYNTACTIC_LOOKAHEAD
+  LOOKAHEAD( ColorMethodInvocation() )
+	ColorMethodInvocation()
 |
   // SYNTACTIC_LOOKAHEAD
   LOOKAHEAD( MethodInvocation() )
@@ -974,22 +1004,38 @@ void Literal() #Literal :
   x = <INTEGER_LITERAL>
   {
     literal = x.image;
-    ch = literal.charAt(literal.length()-1);
-    if(ch == 'l' || ch == 'L')
-    {
-        literal = literal.substring(0,literal.length()-1);
-        jjtThis.value = new Primitive( Long.decode(literal).longValue() );
+    ch = literal.charAt(0);
+    if(ch == '#') 
+    { // is a webcolor literal, which we'll convert to hex
+    		try {
+        	jjtThis.value = new Primitive(
+				Integer.decode( "0x" + literal.substring(1) ).intValue() );
+		} catch ( NumberFormatException e ) {
+			throw createParseException(
+				"Error or number too big for integer type: "+ literal );
+		}    
+    } 
+    else 
+    { // is a regular java literal
+        ch = literal.charAt(literal.length()-1);
+        if(ch == 'l' || ch == 'L')
+        {
+            literal = literal.substring(0,literal.length()-1);
+            jjtThis.value = new Primitive( Long.decode(literal).longValue() );
         
-    }
-    else
-		try {
+        }
+        else
+        {
+    		try {
         	jjtThis.value = new Primitive(
 				Integer.decode( literal ).intValue() );
 		} catch ( NumberFormatException e ) {
 			throw createParseException(
 				"Error or number too big for integer type: "+ literal );
 		}
-  }
+        }
+    }
+}
 |
   x = <FLOATING_POINT_LITERAL>
   {
