@@ -550,7 +550,7 @@ public class Interpreter
             }
             catch(ParseException e)
             {
-                error("Parser Error: " + e.getMessage(DEBUG));
+                error("Parser Error: " + e.getMessage());
 				if ( DEBUG )
                 	e.printStackTrace();
                 if(!interactive)
@@ -729,18 +729,9 @@ public class Interpreter
 						println("<" + retVal + ">");
                 }
             } catch(ParseException e) {
-				/*
                 throw new EvalError(
 					"Sourced file: "+sourceFileInfo+" parser Error: " 
-					+ e.getMessage( DEBUG ), node, callstack );
-				*/
-				if ( DEBUG )
-					// show extra "expecting..." info
-					error( e.getMessage(DEBUG) );
-
-				// add the source file info and throw again
-				e.setErrorSourceFile( sourceFileInfo );
-				throw e;
+					+ e.getMessage(), node, callstack );
 
             } catch ( InterpreterError e ) {
                 e.printStackTrace();
