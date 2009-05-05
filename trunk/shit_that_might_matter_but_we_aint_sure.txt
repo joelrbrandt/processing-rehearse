@@ -1,0 +1,1 @@
+* [5/5/09 JRB] Processing parses floating point literals as floats, beanshell parses them as doubles. This might explode but hasn't yet.
