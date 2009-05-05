@@ -44,6 +44,8 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Field;
 
+import processing.core.PApplet;
+
 /**
     A namespace	in which methods, variables, and imports (class names) live.  
 	This is package public because it is used in the implementation of some 
@@ -123,6 +125,8 @@ public class NameSpace
 	Class classStatic;	
 	Object classInstance;
 
+	private PApplet applet;
+	
 	void setClassStatic( Class clas ) {
 		this.classStatic = clas;
 		importStatic( clas );
@@ -308,7 +312,7 @@ public class NameSpace
 
 		// Locate the variable definition if it exists.
 		Variable existing = getVariableImpl( name, recurse );
-
+		
 		// Found an existing variable here (or above if recurse allowed)
 		if ( existing != null )
 		{
@@ -761,7 +765,31 @@ public class NameSpace
 		// try parent
 		if ( recurse && (var == null) && (parent != null) )
 			var	= parent.getVariableImpl( name, recurse );
-
+		
+		if (var == null && applet != null) {
+			try {
+				Field f = PApplet.class.getField(name);
+				
+				Object obj = f.get(applet);
+				Primitive p = (obj == null) ? Primitive.NULL : null;
+				
+				// boolean byte char short long int double float
+				if (obj instanceof Character || obj instanceof Integer || obj instanceof Float					
+					|| obj instanceof Double || obj instanceof Boolean || obj instanceof Byte
+					|| obj instanceof Character || obj instanceof Short) {
+					p = new Primitive(obj);
+				}
+				
+				var = (p == null) ? createVariable(name, obj, null) 
+						: createVariable(name, p, null);
+				
+			} catch (Exception e) {
+				// Fail silently, it's just not a field.
+				// TODO: Should handle different exceptions differently.
+				System.out.println("No such PApplet field.");
+			}
+		}
+		
 		return var;
     }
 	
@@ -787,7 +815,7 @@ public class NameSpace
 	protected Object unwrapVariable( Variable var ) 
 		throws UtilEvalError
 	{
-		return (var == null) ? Primitive.VOID :	var.getValue();
+		return (var == null) ? Primitive.VOID : var.getValue();
 	}
 
 	/**
@@ -1764,5 +1792,12 @@ public class NameSpace
     				+ ee.getMessage() );
     	}
 	}   
+    
+    
+    // If there is no variable name in scope, fetch it from the applet.
+    // This is for stuff like mouseX.
+    void setApplet(PApplet applet) {
+    	this.applet = applet;
+    }
 }
 

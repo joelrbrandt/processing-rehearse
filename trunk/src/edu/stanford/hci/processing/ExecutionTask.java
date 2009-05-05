@@ -19,7 +19,6 @@ public class ExecutionTask implements Runnable {
 	}
 	
 	public void run() {
-		System.out.println("Run calleddddd");
 		output.setText("");
 		try {	
 			Object obj = interpreter.eval(source);
@@ -30,12 +29,10 @@ public class ExecutionTask implements Runnable {
 			output.append(e.toString());
 			e.printStackTrace();
 		}
-		System.out.println("Run 2");
 		output.append("\n + Line numbers executed:");
 		for (Integer i : interpreter.getLineNumberSet()) {
 			output.append(" " + i);
 		}
-		System.out.println("Run 3");
 	}
 
 }

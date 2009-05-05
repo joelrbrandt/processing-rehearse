@@ -27,10 +27,12 @@ import processing.app.syntax.PdeKeywords;
 import processing.app.syntax.PdeTextAreaDefaults;
 import processing.app.syntax.RehearseTextAreaDefaults;
 import processing.app.syntax.TextAreaDefaults;
+import processing.core.PApplet;
 
 import edu.stanford.hci.processing.ExecutionTask;
 import edu.stanford.hci.processing.ProcessingCanvas;
 import edu.stanford.hci.processing.ProcessingMethods;
+import edu.stanford.hci.processing.RehearsePApplet;
 
 import bsh.ConsoleInterface;
 import bsh.EvalError;
@@ -44,7 +46,7 @@ public class ProcessingEditor extends JFrame implements ActionListener, ConsoleI
 	JTextArea breakpoints;
 
 	JFrame canvasFrame;
-	ProcessingCanvas canvas;
+	RehearsePApplet applet;
 	
 	PrintStream outputStream;
 	
@@ -90,7 +92,10 @@ public class ProcessingEditor extends JFrame implements ActionListener, ConsoleI
 		
 		resumeButton.setEnabled(false);
 		
-		textArea.setText("rect(100, 100, 100, 100)");
+		textArea.setText("void setup() {  \n"
+						 + "background(100, 50, 200); \n" 
+						 + "stroke(153); rect(30, 20, 55, 55); }\n"
+						 + "void draw() {}");
 	}
 
 	/**
@@ -116,19 +121,15 @@ public class ProcessingEditor extends JFrame implements ActionListener, ConsoleI
 			canvasFrame.dispose();
 		
 		canvasFrame = new JFrame();
-		canvasFrame.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
-		canvasFrame.setBounds(700, 0, 100, 100);
+		canvasFrame.setLayout(new BorderLayout());
+		canvasFrame.setSize(500, 500);
 		
-		canvas = new ProcessingCanvas();
-		canvasFrame.getContentPane().add(canvas);
-		canvas.setSize(500,500);
-		canvas.setImageSize(500, 500);
-		canvasFrame.pack();
-		
+		applet = new RehearsePApplet();
+		canvasFrame.add(applet, BorderLayout.CENTER);
 		canvasFrame.setVisible(true);
-		ProcessingMethods methods = new ProcessingMethods(canvas);
+		//ProcessingMethods methods = new ProcessingMethods(canvas);
 		
-		interpreter = new Interpreter(this, methods, canvas);
+		interpreter = new Interpreter(this, applet);
 		
 		String[] breakpointArray = breakpoints.getText().split(" ");
 		for (String str : breakpointArray) {
@@ -141,9 +142,28 @@ public class ProcessingEditor extends JFrame implements ActionListener, ConsoleI
 		}
 		resumeButton.setEnabled(false);
 		String source = textArea.getText();
-		ExecutionTask task = new ExecutionTask(interpreter, source, output);
-		Thread thread = new Thread(task);
-		thread.start();
+//		ExecutionTask task = new ExecutionTask(interpreter, source, output);
+//		Thread thread = new Thread(task);
+//		thread.start();
+		
+		output.setText("");
+		try {
+			// TODO: right now assumes that source has setup() and draw()
+			// so this line just registers setup(), draw() and other
+			// user-defined functions.
+			Object obj = interpreter.eval(source);
+			applet.init();
+			
+			if (obj != null)
+				output.append(obj.toString());
+		} catch (EvalError e) {
+			output.append(e.toString());
+			e.printStackTrace();
+		}
+		output.append("\n + Line numbers executed:");
+		for (Integer i : interpreter.getLineNumberSet()) {
+			output.append(" " + i);
+		}
 	}
 
 	private void doResume() {

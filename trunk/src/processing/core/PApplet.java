@@ -1271,7 +1271,6 @@ public class PApplet extends Applet
 
   // active paint method
   protected void paint() {
-	  System.out.println("you called me");
     try {
       Graphics screen = this.getGraphics();
       if (screen != null) {
