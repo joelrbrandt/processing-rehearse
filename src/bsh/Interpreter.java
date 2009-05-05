@@ -37,11 +37,15 @@ import java.util.HashSet;
 import java.util.Vector;
 import java.awt.Canvas;
 import java.io.*;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
 
+import processing.core.PApplet;
+
 import edu.stanford.hci.processing.ProcessingCanvas;
 import edu.stanford.hci.processing.ProcessingMethods;
+import edu.stanford.hci.processing.RehearsePApplet;
 import edu.stanford.hci.processing.editor.ProcessingEditor;
 
 /**
@@ -156,7 +160,7 @@ public class Interpreter
 	/** Control the verbose printing of results for the show() command. */
 	private boolean showResults;
 
-	private ProcessingCanvas canvas;
+	private RehearsePApplet applet;
 	private ProcessingEditor editor;
 	
 	private HashSet<Integer> lineNumbers = new HashSet<Integer>();
@@ -250,7 +254,7 @@ public class Interpreter
     }
 
     /** This is the entry point for the Processing interpreter. */
-    public Interpreter(ProcessingEditor console, ProcessingMethods methods, ProcessingCanvas canvas) {
+    public Interpreter(ProcessingEditor console, RehearsePApplet applet) {
 		parser = new Parser( in );
 		long t1=System.currentTimeMillis();
         this.in = null;
@@ -258,10 +262,9 @@ public class Interpreter
         this.err = console.getErr();
         this.editor = console;
         
-        this.canvas = canvas;
+        this.applet = applet;
+        applet.setInterpreter(this);
         
-        methods.setErr(err);
-        methods.setOut(out);
         this.interactive = false;
 		debug = err;
 		this.parent = null;
@@ -273,14 +276,24 @@ public class Interpreter
         
         
         // register methods
+        // could be done in the same way as variables but this is easier
         try {
-	        Method[] methodArray = ProcessingMethods.class.getMethods();
-	        for (Method m : methodArray) {
-	        	globalNameSpace.setMethod(m.getName(), new BshMethod(m, methods));
+        	Method[] methodArray = PApplet.class.getMethods();
+        	for (Method m : methodArray) {
+        		if (m.getName().equals("draw")
+        		    || m.getName().equals("setup")
+        		    || m.getName().equals("paint")) {
+        			continue;
+        		}
+	        	globalNameSpace.setMethod(m.getName(), new BshMethod(m, applet));
 	        }
         } catch (UtilEvalError e) {
         	System.err.println(e.toString());
         }
+        
+        // tell namespace to get variables from here
+        globalNameSpace.setApplet(applet);
+        
         
 		// now done in NameSpace automatically when root
 		// The classes which are imported by default
