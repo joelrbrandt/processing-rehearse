@@ -25,6 +25,8 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 	
 	public RehearseEditor(Base ibase, String path, int[] location) {
 		super(ibase, path, location);
+		this.setText("void setup() {} \n"
+					 + "void draw() {}");
 	}
 	
 	@Override
