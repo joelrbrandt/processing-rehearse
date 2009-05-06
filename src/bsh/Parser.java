@@ -2476,7 +2476,7 @@ void VariableDeclaratorId() #VariableDeclaratorId :
         if(ch == 'd' || ch == 'D')
             literal = literal.substring(0,literal.length()-1);
 
-        jjtn000.value = new Primitive( new Double( literal ).doubleValue() );
+        jjtn000.value = new Primitive( new Float( literal ).floatValue() ); // JRB - we parse all floating point numbers as floats cuz that's what processing does
     }
         break;
       case CHARACTER_LITERAL:
