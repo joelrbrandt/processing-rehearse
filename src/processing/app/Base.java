@@ -42,7 +42,7 @@ import processing.core.*;
  */
 public class Base {
   static final int REVISION = 166;
-  static String VERSION_NAME = "0166";
+  protected static String VERSION_NAME = "0166";
 
   static HashMap<Integer, String> platformNames = new HashMap();
   static {
@@ -57,7 +57,7 @@ public class Base {
     platformIndices.put("macosx", PConstants.MACOSX);
     platformIndices.put("linux", PConstants.LINUX);
   }
-  static Platform platform;
+  protected static Platform platform;
 
   static private boolean commandLine;
 
@@ -87,14 +87,14 @@ public class Base {
   static public String librariesClassPath;
 
   // Location for untitled items
-  static File untitledFolder;
+  protected static File untitledFolder;
 
   // p5 icon for the window
 //  static Image icon;
 
 //  int editorCount;
 //  Editor[] editors;
-  java.util.List<Editor> editors =
+  protected java.util.List<Editor> editors =
     Collections.synchronizedList(new ArrayList<Editor>());
 //  ArrayList editors = Collections.synchronizedList(new ArrayList<Editor>());
   Editor activeEditor;

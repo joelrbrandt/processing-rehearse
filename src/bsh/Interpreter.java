@@ -47,6 +47,7 @@ import edu.stanford.hci.processing.ProcessingCanvas;
 import edu.stanford.hci.processing.ProcessingMethods;
 import edu.stanford.hci.processing.RehearsePApplet;
 import edu.stanford.hci.processing.editor.ProcessingEditor;
+import edu.stanford.hci.processing.editor.RehearseEditor;
 
 /**
 	The BeanShell script interpreter.
@@ -161,7 +162,7 @@ public class Interpreter
 	private boolean showResults;
 
 	private RehearsePApplet applet;
-	private ProcessingEditor editor;
+	private RehearseEditor editor;
 	
 	private HashSet<Integer> lineNumbers = new HashSet<Integer>();
 	private HashSet<Integer> breakpointLineNumbers = new HashSet<Integer>();
@@ -254,7 +255,7 @@ public class Interpreter
     }
 
     /** This is the entry point for the Processing interpreter. */
-    public Interpreter(ProcessingEditor console, RehearsePApplet applet) {
+    public Interpreter(RehearseEditor console, RehearsePApplet applet) {
 		parser = new Parser( in );
 		long t1=System.currentTimeMillis();
         this.in = null;
@@ -1352,7 +1353,7 @@ public class Interpreter
 	
 	public void setSuspended(boolean suspended) {
 		this.suspended = suspended;
-		editor.setResumable(suspended);
+		//editor.setResumable(suspended);
 	}
 
 	public int getLastExecutedLine() {

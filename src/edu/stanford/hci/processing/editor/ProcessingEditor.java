@@ -38,6 +38,7 @@ import bsh.ConsoleInterface;
 import bsh.EvalError;
 import bsh.Interpreter;
 
+@Deprecated
 public class ProcessingEditor extends JFrame implements ActionListener, ConsoleInterface {
 	JButton runButton;
 	JButton resumeButton;
@@ -129,7 +130,8 @@ public class ProcessingEditor extends JFrame implements ActionListener, ConsoleI
 		canvasFrame.setVisible(true);
 		//ProcessingMethods methods = new ProcessingMethods(canvas);
 		
-		interpreter = new Interpreter(this, applet);
+		// THIS CLASS IS DEPRECATED DONT USE.
+		//interpreter = new Interpreter(this, applet);
 		
 		String[] breakpointArray = breakpoints.getText().split(" ");
 		for (String str : breakpointArray) {

@@ -89,7 +89,7 @@ public class Editor extends JFrame implements RunnerListener {
 
   EditorHeader header;
   EditorStatus status;
-  EditorConsole console;
+  protected EditorConsole console;
 
   JSplitPane splitPane;
   JPanel consolePanel;
