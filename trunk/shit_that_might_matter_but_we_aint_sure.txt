@@ -1,1 +1,1 @@
-* [5/5/09 JRB] Processing parses floating point literals as floats, beanshell parses them as doubles. This might explode but hasn't yet.
+* [5/5/09 JRB] We currently parse 3.4d as a float literal. Processing fails to parse this at all. We could also either fail, or parse it as a double. Who knows.
