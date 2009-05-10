@@ -29,4 +29,9 @@ public class RehearsePApplet extends PApplet {
 			throw new RuntimeException(e);
 		}
 	}
+	
+	@Override
+	protected void exit2() {
+		// do nothing instead of System.exit
+	}
 }
