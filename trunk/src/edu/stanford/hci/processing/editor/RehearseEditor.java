@@ -1,6 +1,8 @@
 package edu.stanford.hci.processing.editor;
 
 import java.awt.BorderLayout;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -42,6 +44,13 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 		applet = new RehearsePApplet();
 		canvasFrame.add(applet, BorderLayout.CENTER);
 		canvasFrame.setVisible(true);
+		canvasFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		canvasFrame.addWindowListener(new WindowAdapter() {		
+			public void windowClosing(WindowEvent e) {
+				applet.stop();
+			}
+		});
+		//canvasFrame.setDefaultCloseOperation();
 		//ProcessingMethods methods = new ProcessingMethods(canvas);
 		
 		interpreter = new Interpreter(this, applet);
