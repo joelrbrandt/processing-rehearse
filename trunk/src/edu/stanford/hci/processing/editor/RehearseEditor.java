@@ -36,6 +36,8 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 		// clear previous context
 		if (canvasFrame != null)
 			canvasFrame.dispose();
+		if (applet != null)
+			applet.stop();
 		
 		canvasFrame = new JFrame();
 		canvasFrame.setLayout(new BorderLayout());
