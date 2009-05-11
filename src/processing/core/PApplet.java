@@ -2224,7 +2224,7 @@ public class PApplet extends Applet
   }
 
 
-  void exit2() {
+  protected void exit2() {
     try {
       System.exit(0);
     } catch (SecurityException e) {
