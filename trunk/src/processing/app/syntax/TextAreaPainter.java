@@ -631,12 +631,13 @@ implements TabExpander, Printable
   protected void paintHighlight(Graphics gfx, int line, int y)
   {
     if (!printing) {
-      if (line >= textArea.getSelectionStartLine()
-          && line <= textArea.getSelectionStopLine())
-        paintLineHighlight(gfx,line,y);
 
       if (highlights != null)
         highlights.paintHighlight(gfx,line,y);
+    	
+      if (line >= textArea.getSelectionStartLine()
+          && line <= textArea.getSelectionStopLine())
+        paintLineHighlight(gfx,line,y);
 
       if (bracketHighlight && line == textArea.getBracketLine())
         paintBracketHighlight(gfx,line,y);

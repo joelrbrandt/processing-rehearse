@@ -33,6 +33,8 @@
 
 package bsh;
 
+import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Vector;
 import java.awt.Canvas;
@@ -164,7 +166,7 @@ public class Interpreter
 	private RehearsePApplet applet;
 	private RehearseEditor editor;
 	
-	private HashSet<Integer> lineNumbers = new HashSet<Integer>();
+	private HashMap<Integer, Date> lineNumbers = new HashMap<Integer, Date>();
 	private HashSet<Integer> breakpointLineNumbers = new HashSet<Integer>();
 	private Object breakpointLock = new Object();
 	private int lastExecutedLine = -1;
@@ -1180,11 +1182,13 @@ public class Interpreter
 		return this.strictJava;
 	}
 
-	public void setLineNumberSet(HashSet numbers) {
+	// TODO: do we still need this?
+	public void setLineNumberSet(HashMap<Integer, Date> numbers) {
 		this.lineNumbers = numbers;
 	}
 	
-	public HashSet<Integer> getLineNumberSet() {
+	// TODO: this seems dangerous, we don't want callers to randomly modify this...
+	public HashMap<Integer, Date> getLineNumberSet() {
 		return lineNumbers;
 	}
 	
@@ -1360,8 +1364,20 @@ public class Interpreter
 		return lastExecutedLine;
 	}
 
-	public void setLastExecutedLine(int lastExecutedLine) {
-		this.lastExecutedLine = lastExecutedLine;
+	// TODO: check source?
+	public void doLog(int line) {
+		lineNumbers.put(lastExecutedLine, new Date());
+		if (lastExecutedLine == line) {
+			// nothing to see here, just exit.
+			return;
+		}
+		
+		lastExecutedLine = line;
+		editor.notifyLineExecution();
 	}
+	
+//	public void setLastExecutedLine(int lastExecutedLine) {
+//		this.lastExecutedLine = lastExecutedLine;
+//	}
 }
 
