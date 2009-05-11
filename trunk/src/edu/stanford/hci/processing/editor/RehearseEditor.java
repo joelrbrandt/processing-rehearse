@@ -79,6 +79,7 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 		
 		interpreter = new Interpreter(this, applet);
 		
+		
 		String source = super.getText();
 //		ExecutionTask task = new ExecutionTask(interpreter, source, output);
 //		Thread thread = new Thread(task);
