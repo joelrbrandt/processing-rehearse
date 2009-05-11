@@ -101,7 +101,7 @@ public class Editor extends JFrame implements RunnerListener {
 
   EditorLineStatus lineStatus;
 
-  JEditTextArea textarea;
+  protected JEditTextArea textarea;
   EditorListener listener;
 
   // runtime information and window placement

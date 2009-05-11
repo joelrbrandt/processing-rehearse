@@ -17,6 +17,9 @@ import javax.swing.event.*;
 import javax.swing.text.*;
 import javax.swing.undo.*;
 import javax.swing.*;
+
+import edu.stanford.hci.processing.editor.SidebarPainter;
+
 import java.awt.datatransfer.*;
 import java.awt.event.*;
 import java.awt.*;
@@ -62,6 +65,8 @@ public class JEditTextArea extends JComponent
    */
   public static String LEFT_OF_SCROLLBAR = "los";
 
+private SidebarPainter bPainter;
+
   /**
    * Creates a new JEditTextArea with the default settings.
    */
@@ -92,7 +97,15 @@ public class JEditTextArea extends JComponent
 
     // Initialize the GUI
     setLayout(new ScrollLayout());
-    add(CENTER, painter);
+    
+    // New painting component with breakpoints:
+    JPanel editPanel = new JPanel(new BorderLayout());
+    editPanel.add(painter, BorderLayout.CENTER);
+    bPainter = new SidebarPainter(this, painter);
+    bPainter.setPreferredSize(new Dimension(40,400));
+    editPanel.add(bPainter, BorderLayout.LINE_START);
+    
+    add(CENTER, editPanel);
     add(RIGHT, vertical = new JScrollBar(JScrollBar.VERTICAL));
     add(BOTTOM, horizontal = new JScrollBar(JScrollBar.HORIZONTAL));
 
@@ -319,6 +332,7 @@ public class JEditTextArea extends JComponent
       updateScrollBars();
     }
     painter.repaint();
+    bPainter.repaint();
   }
 
   /**
@@ -361,6 +375,7 @@ public class JEditTextArea extends JComponent
     if(horizontalOffset != horizontal.getValue())
       updateScrollBars();
     painter.repaint();
+    bPainter.repaint();
   }
 
   /**
@@ -391,6 +406,7 @@ public class JEditTextArea extends JComponent
       {
         updateScrollBars();
         painter.repaint();
+        bPainter.repaint();
       }
 
     return changed;
@@ -716,6 +732,7 @@ public class JEditTextArea extends JComponent
     select(0, 0);
     updateScrollBars();
     painter.repaint();
+    bPainter.repaint();
   }
 
 
@@ -737,6 +754,7 @@ public class JEditTextArea extends JComponent
     updateScrollBars();
     setScrollPosition(scroll);
     painter.repaint();
+    bPainter.repaint();
   }
 
 
