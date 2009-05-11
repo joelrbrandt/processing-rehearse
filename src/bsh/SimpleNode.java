@@ -35,6 +35,7 @@
 package bsh;
 
 import java.awt.image.BufferedImage;
+import java.util.Date;
 
 /*
 	Note: great care (and lots of typing) were taken to insure that the
@@ -157,7 +158,7 @@ class SimpleNode implements Node
 
 	public final Object eval(CallStack callstack, Interpreter interpreter) 
 		throws EvalError {
-		doLog(interpreter);
+		//doLog(interpreter);
 		
 		// Don't break if we just executed another node on this line
 		// (Avoids breaking multiple times in one run through a line)
@@ -169,7 +170,7 @@ class SimpleNode implements Node
 		// TODO: Technically there is a possibility for concurrency issues
 		// if the user hits the Resume button somewhere here.
 		
-		interpreter.setLastExecutedLine(getLineNumber());
+		interpreter.doLog(getLineNumber());
 		synchronized(interpreter.getBreakpointLock()) {
 			try {
 				while (interpreter.isSuspended()) {
@@ -251,11 +252,6 @@ class SimpleNode implements Node
 		}
 			
 		return text.toString();
-	}
-	
-	public void doLog(Interpreter interpreter) {
-		// TODO: Check source?
-		interpreter.getLineNumberSet().add(getLineNumber());
 	}
 }
 

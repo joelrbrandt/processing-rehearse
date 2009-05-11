@@ -30,9 +30,10 @@ public class ExecutionTask implements Runnable {
 			e.printStackTrace();
 		}
 		output.append("\n + Line numbers executed:");
-		for (Integer i : interpreter.getLineNumberSet()) {
-			output.append(" " + i);
-		}
+		// we're not using this class anymore, won't bother fixing this.
+//		for (Integer i : interpreter.getLineNumberSet()) {
+//			output.append(" " + i);
+//		}
 	}
 
 }
