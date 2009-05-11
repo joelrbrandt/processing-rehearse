@@ -9,7 +9,7 @@ Auto-breakpoint on lines that contain errors
   # implement it
 
 === Notes ===
-  * Will require reloading of class when methods are added/deleted/signature changed
+  * Will require reloading of class when methods are added/deleted/signature changed (but that seems to be supported by BeanShell). There are issues with old instances of classes not having the right methods. Things could explode.
   * Will require a pretty robust parser to find errors and still continue to parse (different than BeanShell's?)
 
 == Visualization of Lines that Execute ==
@@ -27,3 +27,8 @@ Like breakpoints, but execution continues. A couple of features could be support
    * Perhaps demarcate times where a variable has been changed by a line of code that has never changed it before (in this execution)
    * Perhaps show how variable has changed over time (graph?)
    * Perhaps allow browsing through output and see variable value at those times
+
+=== Steps ===
+  # implement it
+
+=== Notes ===
