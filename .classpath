@@ -7,5 +7,10 @@
 	<classpathentry kind="lib" path="lib/jna.jar"/>
 	<classpathentry kind="lib" path="lib/apple.jar"/>
 	<classpathentry kind="lib" path="lib/ecj.jar"/>
+	<classpathentry kind="lib" path="lib/opengl.jar"/>
+	<classpathentry kind="lib" path="lib/gluegen-rt.jar"/>
+	<classpathentry kind="lib" path="lib/gluegen-rt-natives-macosx-universal.jar"/>
+	<classpathentry kind="lib" path="lib/jogl.jar"/>
+	<classpathentry kind="lib" path="lib/jogl-natives-macosx-universal.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

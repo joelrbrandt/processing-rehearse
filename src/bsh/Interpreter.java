@@ -1373,7 +1373,15 @@ public class Interpreter
 		}
 		
 		lastExecutedLine = line;
-		editor.notifyLineExecution();
+		if (editor != null) { // TODO: figure out why this is null sometimes
+			editor.notifyLineExecution();
+		} else {
+			System.out.println("Editor was null, Ben thinks that is whack.");
+		}
+	}
+
+	public RehearsePApplet getApplet() {
+		return applet;
 	}
 	
 //	public void setLastExecutedLine(int lastExecutedLine) {

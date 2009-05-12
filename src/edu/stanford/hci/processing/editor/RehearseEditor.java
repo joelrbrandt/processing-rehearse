@@ -14,6 +14,8 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.Reader;
 import java.io.StringReader;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
@@ -33,43 +35,44 @@ import processing.app.Editor;
 import processing.app.syntax.JEditTextArea;
 import processing.app.syntax.TextAreaPainter;
 import processing.app.syntax.TextAreaPainter.Highlight;
+import processing.core.PApplet;
 
 public class RehearseEditor extends Editor implements ConsoleInterface {
 
 	private JFrame canvasFrame;
 	private RehearsePApplet applet;
 	private PrintStream outputStream;
-	
+
 	private HashMap<Integer, Color> lineHighlights
-		= new HashMap<Integer, Color>();
-	
+	= new HashMap<Integer, Color>();
+
 	private Interpreter interpreter;
-	
+
 	private ArrayList<Image> snapshots = new ArrayList<Image>();
-	
+
 	public RehearseEditor(Base ibase, String path, int[] location) {
 		super(ibase, path, location);
 		this.setText("void setup() {} \n"
-					 + "void draw() {}");
+				+ "void draw() {}");
 		getTextArea().getPainter().addCustomHighlight(new RehearseHighlight());
-		
+
 		// TODO: I think this will need to be updated when we open a new document.
 		getTextArea().getDocument().addDocumentListener(new RehearseDocumentListener());
 	}
-	
+
 	@Override
 	public void handleRun(boolean present) {
-	
+
 		// clear previous context
 		if (canvasFrame != null)
 			canvasFrame.dispose();
 		if (applet != null)
 			applet.stop();
-		
+
 		canvasFrame = new JFrame();
 		canvasFrame.setLayout(new BorderLayout());
 		canvasFrame.setSize(500, 500);
-		
+
 		applet = new RehearsePApplet();
 		canvasFrame.add(applet, BorderLayout.CENTER);
 		canvasFrame.setVisible(true);
@@ -85,15 +88,47 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 		});
 		//canvasFrame.setDefaultCloseOperation();
 		//ProcessingMethods methods = new ProcessingMethods(canvas);
-		
+
 		interpreter = new Interpreter(this, applet);
-		
-		
+
+		/* No longer sure this is needed, I think just setting the package solves all problems
+		// Add current classpath to the interpreter's classpath
+		String classpath = System.getProperty("java.class.path");
+		String[] paths = classpath.split(":");
+		for (String p : paths) {
+			URL processingClassPath = null;
+			try {
+				processingClassPath = new URL("file://" + p);
+			} catch (MalformedURLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+
+			if (processingClassPath != null) {
+				try {
+					interpreter.getClassManager().addClassPath(processingClassPath);
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		}
+		*/
+
+		// now, add our script to the processing.core package
+		try {
+			interpreter.eval("package processing.core;");
+		} catch (EvalError e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+
 		String source = super.getText();
 //		ExecutionTask task = new ExecutionTask(interpreter, source, output);
 //		Thread thread = new Thread(task);
 //		thread.start();
-		
+
 		console.clear();
 		lineHighlights.clear();
 		snapshots.clear();
@@ -104,7 +139,7 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 			// user-defined functions.
 			Object obj = interpreter.eval(source);
 			applet.init();
-			
+
 			if (obj != null)
 				console.message(obj.toString(), false, false);
 		} catch (EvalError e) {
@@ -112,7 +147,7 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void error(Object o) {
 		getOut().append(o.toString() + "\n");
 	}
@@ -144,27 +179,27 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 		System.out.println("Last line executed: " + line);
 		lineHighlights.put(line, Color.GREEN);
 		getTextArea().repaint();
-		
+
 		Set<Integer> snapshotPoints = getTextArea().getBPainter()
-			.getHighlightedPoints();
-		
+		.getHighlightedPoints();
+
 		// snapshotPoints is zero-indexed, interpreter is one-indexed.
 		if (snapshotPoints.contains(line - 1)) {
 			snapshots.add(applet.get().getImage());
 		}
 	}
-	
+
 	public class TextAreaOutputStream extends OutputStream {
 		public void write( int b ) throws IOException {
 			System.out.println("TAOS gets call");
 			console.message( String.valueOf( ( char )b ), false, false);
 		}
 	}
-	
+
 	private class RehearseHighlight implements TextAreaPainter.Highlight {
 		JEditTextArea textarea;
 		Highlight next;
-		
+
 		public String getToolTipText(MouseEvent evt) {
 			if (next != null) {
 				return null;
@@ -185,15 +220,15 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 				int height = fm.getHeight();
 				y += fm.getLeading() + fm.getMaxDescent();
 				gfx.setColor(c);
-		        gfx.fillRect(0,y,getWidth(),height);
+				gfx.fillRect(0,y,getWidth(),height);
 			}
-			
+
 			if (next != null) {
 				next.paintHighlight(gfx, line, y);
 			}
 		}
 	}
-	
+
 	// TODO: it'd be better if it didn't just clear but instead
 	// moved the line annotations around.
 	class RehearseDocumentListener implements DocumentListener {
@@ -211,6 +246,6 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 			lineHighlights.clear();
 			getTextArea().repaint();
 		}
-		
+
 	}
 }
