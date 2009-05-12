@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -13,7 +14,9 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -41,6 +44,8 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 		= new HashMap<Integer, Color>();
 	
 	private Interpreter interpreter;
+	
+	private ArrayList<Image> snapshots = new ArrayList<Image>();
 	
 	public RehearseEditor(Base ibase, String path, int[] location) {
 		super(ibase, path, location);
@@ -72,6 +77,10 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 		canvasFrame.addWindowListener(new WindowAdapter() {		
 			public void windowClosing(WindowEvent e) {
 				applet.stop();
+				if (snapshots.size() > 0) {
+					RehearseImageViewer viewer = new RehearseImageViewer(snapshots);
+					viewer.setVisible(true);
+				}
 			}
 		});
 		//canvasFrame.setDefaultCloseOperation();
@@ -87,6 +96,7 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 		
 		console.clear();
 		lineHighlights.clear();
+		snapshots.clear();
 		getTextArea().repaint();
 		try {
 			// TODO: right now assumes that source has setup() and draw()
@@ -134,6 +144,14 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 		System.out.println("Last line executed: " + line);
 		lineHighlights.put(line, Color.GREEN);
 		getTextArea().repaint();
+		
+		Set<Integer> snapshotPoints = getTextArea().getBPainter()
+			.getHighlightedPoints();
+		
+		// snapshotPoints is zero-indexed, interpreter is one-indexed.
+		if (snapshotPoints.contains(line - 1)) {
+			snapshots.add(applet.get().getImage());
+		}
 	}
 	
 	public class TextAreaOutputStream extends OutputStream {
