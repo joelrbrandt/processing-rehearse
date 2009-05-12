@@ -19,6 +19,10 @@ public class SidebarPainter extends JComponent {
 	private JEditTextArea textArea;
 	private Set<Integer> highlightedPoints;
 	
+	public Set<Integer> getHighlightedPoints() {
+		return highlightedPoints;
+	}
+
 	public SidebarPainter(JEditTextArea textArea, TextAreaPainter textAreaPainter) {
 		this.textArea = textArea;
 		this.textAreaPainter = textAreaPainter;

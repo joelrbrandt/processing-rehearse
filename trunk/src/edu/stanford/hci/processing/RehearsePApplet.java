@@ -1,5 +1,7 @@
 package edu.stanford.hci.processing;
 
+import java.awt.Image;
+
 import bsh.EvalError;
 import bsh.Interpreter;
 import processing.core.PApplet;
@@ -33,5 +35,9 @@ public class RehearsePApplet extends PApplet {
 	@Override
 	protected void exit2() {
 		// do nothing instead of System.exit
+	}
+	
+	public Image snapshot() {
+		return g.getImage();
 	}
 }

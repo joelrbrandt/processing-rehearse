@@ -138,7 +138,12 @@ private SidebarPainter bPainter;
   }
 
 
-  /**
+  public SidebarPainter getBPainter() {
+	return bPainter;
+}
+
+
+/**
    * Get current position of the vertical scroll bar. [fry]
    */
   public int getScrollPosition() {

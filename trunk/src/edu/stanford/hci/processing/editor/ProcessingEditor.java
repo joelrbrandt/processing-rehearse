@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -52,7 +53,9 @@ public class ProcessingEditor extends JFrame implements ActionListener, ConsoleI
 	PrintStream outputStream;
 	
 	Interpreter interpreter;
-
+	ArrayList<Image> snapshotList = new ArrayList<Image>();
+	
+	
 	public ProcessingEditor() {
 		super();
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
