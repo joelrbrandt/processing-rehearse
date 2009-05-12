@@ -46,7 +46,6 @@ public class RehearseImageViewer extends JFrame {
 		JPanel buttonPanel = new JPanel();
 		next = new JButton("Next");
 		next.addActionListener(new ActionListener() {
-			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				currImage++;
 				if (currImage >= imageList.size()) {
@@ -57,7 +56,6 @@ public class RehearseImageViewer extends JFrame {
 		});
 		previous = new JButton("Previous");
 		previous.addActionListener(new ActionListener() {
-			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				currImage--;
 				if (currImage < 0) {
