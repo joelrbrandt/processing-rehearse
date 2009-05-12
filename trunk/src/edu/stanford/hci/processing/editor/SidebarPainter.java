@@ -2,23 +2,16 @@ package edu.stanford.hci.processing.editor;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.swing.JComponent;
-import javax.swing.text.PlainDocument;
 
-import processing.app.Base;
 import processing.app.syntax.JEditTextArea;
-import processing.app.syntax.TextAreaDefaults;
 import processing.app.syntax.TextAreaPainter;
-import processing.app.syntax.TokenMarker;
 
 public class SidebarPainter extends JComponent {
 
@@ -68,10 +61,17 @@ public class SidebarPainter extends JComponent {
 		public void mousePressed(MouseEvent e) {
 			int height = textAreaPainter.getFontHeight();
 			int line = textArea.getFirstLine() + e.getY() / height;
-			System.out.println(line);
+			//System.out.println(line);
+			
+			if (line >= textArea.getLineCount())
+				return;
+			
+			String lineText = textArea.getLineText(line);
+			
 			if (highlightedPoints.contains(line)) {
 				highlightedPoints.remove(line);
-			} else {
+			} else if (lineText != null && lineText.trim().length() != 0){
+				// if blank line only allow removing the point.
 				highlightedPoints.add(line);
 			}
 			SidebarPainter.this.repaint();
