@@ -279,20 +279,22 @@ public class Interpreter
         
         
         // register methods
-        // could be done in the same way as variables but this is easier
+        // This should probably be handled by RehearsePApplet
+        // doesn't look like it belongs here.
         try {
         	Method[] methodArray = PApplet.class.getMethods();
         	for (Method m : methodArray) {
-        		if (m.getName().equals("draw")
-        		    || m.getName().equals("setup")
-        		    || m.getName().equals("paint")) {
-        			continue;
-        		}
-	        	globalNameSpace.setMethod(m.getName(), new BshMethod(m, applet));
+        		String name = m.getName();
+        		
+        		// Do not register methods that user code should not call,
+        		// like setup(), mouseClicked(), etc.
+        		if (RehearsePApplet.isCallableMethodName(name)) {
+        			globalNameSpace.setMethod(m.getName(), new BshMethod(m, applet));
+        		} 
 	        }
         } catch (UtilEvalError e) {
         	System.err.println(e.toString());
-        }
+        } 
         
         // tell namespace to get variables from here
         globalNameSpace.setApplet(applet);
@@ -1376,7 +1378,8 @@ public class Interpreter
 		if (editor != null) { // TODO: figure out why this is null sometimes
 			editor.notifyLineExecution();
 		} else {
-			System.out.println("Editor was null, Ben thinks that is whack.");
+			// commented this out, is killing my debugging.
+			//System.out.println("Editor was null, Ben thinks that is whack.");
 		}
 	}
 

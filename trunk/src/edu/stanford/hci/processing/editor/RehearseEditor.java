@@ -18,6 +18,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import javax.swing.JFrame;
@@ -138,6 +139,8 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 			// so this line just registers setup(), draw() and other
 			// user-defined functions.
 			Object obj = interpreter.eval(source);
+		
+			// This actually starts the program.
 			applet.init();
 
 			if (obj != null)
@@ -176,12 +179,19 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 
 	public void notifyLineExecution() {
 		int line = interpreter.getLastExecutedLine();
-		System.out.println("Last line executed: " + line);
+		
+		for (Map.Entry<Integer, Color> entry : lineHighlights.entrySet()) {
+//			Color c = entry.getValue();
+//			int green = c.getGreen() + (256 - c.getGreen()) / 100;
+//			entry.setValue(new Color(c.getRed(), c.getBlue(), green));
+			entry.setValue(Color.YELLOW);
+		}
+		
 		lineHighlights.put(line, Color.GREEN);
 		getTextArea().repaint();
 
 		Set<Integer> snapshotPoints = getTextArea().getBPainter()
-		.getHighlightedPoints();
+			.getHighlightedPoints();
 
 		// snapshotPoints is zero-indexed, interpreter is one-indexed.
 		if (snapshotPoints.contains(line - 1)) {
@@ -191,7 +201,6 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 
 	public class TextAreaOutputStream extends OutputStream {
 		public void write( int b ) throws IOException {
-			System.out.println("TAOS gets call");
 			console.message( String.valueOf( ( char )b ), false, false);
 		}
 	}
