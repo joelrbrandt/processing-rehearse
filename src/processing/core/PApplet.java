@@ -1693,7 +1693,7 @@ public class PApplet extends Applet
    * then mouseReleased(), then mouseClicked(). Note that
    * mousePressed is already false inside of mouseClicked().
    */
-  public void mouseClicked() { }
+  public void mouseClicked() {   }
 
   /**
    * Mouse button is pressed and the mouse has been dragged.
@@ -1703,7 +1703,7 @@ public class PApplet extends Applet
   /**
    * Mouse button is not pressed but the mouse has changed locations.
    */
-  public void mouseMoved() { }
+  public void mouseMoved() {  }
 
 
   //////////////////////////////////////////////////////////////
