@@ -17,16 +17,10 @@ public class SidebarPainter extends JComponent {
 
 	private TextAreaPainter textAreaPainter;
 	private JEditTextArea textArea;
-	private Set<Integer> highlightedPoints;
 	
-	public Set<Integer> getHighlightedPoints() {
-		return highlightedPoints;
-	}
-
 	public SidebarPainter(JEditTextArea textArea, TextAreaPainter textAreaPainter) {
 		this.textArea = textArea;
 		this.textAreaPainter = textAreaPainter;
-		this.highlightedPoints = new HashSet<Integer>();
 		setAutoscrolls(true);
 		setDoubleBuffered(true);
 		setOpaque(true);
@@ -51,7 +45,13 @@ public class SidebarPainter extends JComponent {
 	    int lastInvalid = firstLine + (clipRect.y + clipRect.height - 1) / height;
 
 	    for (int line = firstInvalid; line <= lastInvalid; line++) {
-	        Color c = (highlightedPoints.contains(line)) ? Color.red : Color.gray;
+	    	Color c = Color.gray;
+	    	if (line < textArea.getLineCount()) {
+	    		RehearseLineModel m = 
+	    			(RehearseLineModel)textArea.getTokenMarker().getLineModelAt(line);
+	    		if (m != null && m.isPrintPoint)
+	    			c = Color.red;
+	    	}
 	        gfx.setColor(c);
 		    int y = textArea.lineToY(line);
 	        gfx.fillRect(0, y + 3, getWidth(), height);
@@ -71,12 +71,17 @@ public class SidebarPainter extends JComponent {
 				return;
 			
 			String lineText = textArea.getLineText(line);
+			RehearseLineModel m = 
+	    		(RehearseLineModel)textArea.getTokenMarker().getLineModelAt(line);
+			if (m == null) {
+				m = new RehearseLineModel();
+				textArea.getTokenMarker().setLineModelAt(line, m);
+			}
 			
-			if (highlightedPoints.contains(line)) {
-				highlightedPoints.remove(line);
+			if (m.isPrintPoint) {
+				m.isPrintPoint = false;
 			} else if (lineText != null && lineText.trim().length() != 0){
-				// if blank line only allow removing the point.
-				highlightedPoints.add(line);
+				m.isPrintPoint = true;
 			}
 			SidebarPainter.this.repaint();
 		}
