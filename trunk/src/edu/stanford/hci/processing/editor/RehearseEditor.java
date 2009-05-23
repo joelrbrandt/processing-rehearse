@@ -31,6 +31,7 @@ import bsh.ConsoleInterface;
 import bsh.EvalError;
 import bsh.Interpreter;
 import edu.stanford.hci.processing.RehearsePApplet;
+import edu.stanford.hci.processing.StaticModeException;
 import processing.app.Base;
 import processing.app.Editor;
 import processing.app.syntax.JEditTextArea;
@@ -135,11 +136,15 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 		snapshots.clear();
 		getTextArea().repaint();
 		try {
-			// TODO: right now assumes that source has setup() and draw()
-			// so this line just registers setup(), draw() and other
-			// user-defined functions.
-			Object obj = interpreter.eval(source);
-		
+			Object obj;
+			try {
+				obj = interpreter.eval(source, true);
+			} catch (StaticModeException e) {
+				// Code was written in static mode, let's try again.
+				System.out.println("Code written in static mode, wrapping and restarting.");
+				// this is kind of gross...
+				obj = interpreter.eval("setup() {" + source + "}");
+			}
 			// This actually starts the program.
 			applet.init();
 
