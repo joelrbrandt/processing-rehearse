@@ -195,11 +195,10 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 		lineHighlights.put(line, Color.GREEN);
 		getTextArea().repaint();
 
-		Set<Integer> snapshotPoints = getTextArea().getBPainter()
-			.getHighlightedPoints();
-
 		// snapshotPoints is zero-indexed, interpreter is one-indexed.
-		if (snapshotPoints.contains(line - 1)) {
+		RehearseLineModel m = 
+			(RehearseLineModel)getTextArea().getTokenMarker().getLineModelAt(line - 1);
+		if (m != null && m.isPrintPoint) {
 			snapshots.add(applet.get().getImage());
 		}
 	}
