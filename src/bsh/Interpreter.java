@@ -48,6 +48,7 @@ import processing.core.PApplet;
 import edu.stanford.hci.processing.ProcessingCanvas;
 import edu.stanford.hci.processing.ProcessingMethods;
 import edu.stanford.hci.processing.RehearsePApplet;
+import edu.stanford.hci.processing.StaticModeException;
 import edu.stanford.hci.processing.editor.ProcessingEditor;
 import edu.stanford.hci.processing.editor.RehearseEditor;
 
@@ -670,6 +671,18 @@ public class Interpreter
 		return source( filename, globalNameSpace );
 	}
 
+    public Object eval( 
+    	Reader in, NameSpace nameSpace, String sourceFileInfo) 
+    	throws EvalError {
+    	try {
+    		return eval(in, nameSpace, sourceFileInfo, false);
+    	} catch (StaticModeException e) {
+    		// we didn't check for static mode, 
+    		// so no reason this should be thrown...
+    		throw new RuntimeException(e);
+    	}
+    }
+    
     /**
         Spawn a non-interactive local interpreter to evaluate text in the 
 		specified namespace.  
@@ -694,9 +707,10 @@ public class Interpreter
 	*/
 
     public Object eval( 
-		Reader in, NameSpace nameSpace, String sourceFileInfo
+		Reader in, NameSpace nameSpace, String sourceFileInfo, 
+		boolean staticModeCheck
 			/*, CallStack callstack */ ) 
-		throws EvalError 
+		throws EvalError, StaticModeException
 	{
 		Object retVal = null;
 		if ( Interpreter.DEBUG ) debug("eval: nameSpace = "+nameSpace);
@@ -729,6 +743,13 @@ public class Interpreter
 					if ( TRACE )
 						println( "// " +node.getText() );
 					
+					// If this code is written in static mode,
+					// throw exception; caller will wrap and restart.
+					if (staticModeCheck
+						&& !(node instanceof BSHTypedVariableDeclaration)
+						&& !(node instanceof BSHMethodDeclaration)) {
+						throw new StaticModeException();
+					}
 					// eval
 					retVal = node.eval( callstack, this );
                     
@@ -768,6 +789,9 @@ public class Interpreter
 				if ( e.getNode()==null )
 					e.setNode( node );
 				e.reThrow( "Sourced file: "+sourceFileInfo );
+            } catch (StaticModeException e) {
+            	// pass this up.
+            	throw e;
             } catch ( Exception e) {
                 if ( true)
                 	e.printStackTrace();
@@ -790,7 +814,7 @@ public class Interpreter
         }
 		return Primitive.unwrap( retVal );
     }
-
+    
 	/**
 		Evaluate the inputstream in this interpreter's global namespace.
 	*/
@@ -807,6 +831,17 @@ public class Interpreter
 		return eval(statements, globalNameSpace);
 	}
 
+    /** As above, but allows for static mode checking. */
+    public Object eval( String statements, boolean staticModeCheck ) 
+    	throws EvalError, StaticModeException {
+		if ( Interpreter.DEBUG ) debug("eval(String): "+statements);
+		
+		String s = ( statements.endsWith(";") ? statements : statements+";" );
+    	String sourceFileInfo = "inline evaluation of: ``" + showEvalString(s)+ "''";
+		return eval(new StringReader(statements), globalNameSpace,
+				sourceFileInfo, true);
+	}
+    
 	/**
 		Evaluate the string in the specified namespace.
 	*/
