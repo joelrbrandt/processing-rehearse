@@ -44,12 +44,10 @@ import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
 
 import processing.core.PApplet;
+import processing.core.PApplet.RendererChangeException;
 
-import edu.stanford.hci.processing.ProcessingCanvas;
-import edu.stanford.hci.processing.ProcessingMethods;
 import edu.stanford.hci.processing.RehearsePApplet;
 import edu.stanford.hci.processing.StaticModeException;
-import edu.stanford.hci.processing.editor.ProcessingEditor;
 import edu.stanford.hci.processing.editor.RehearseEditor;
 
 /**
@@ -710,7 +708,7 @@ public class Interpreter
 		Reader in, NameSpace nameSpace, String sourceFileInfo, 
 		boolean staticModeCheck
 			/*, CallStack callstack */ ) 
-		throws EvalError, StaticModeException
+		throws EvalError, StaticModeException, RendererChangeException
 	{
 		Object retVal = null;
 		if ( Interpreter.DEBUG ) debug("eval: nameSpace = "+nameSpace);
@@ -791,6 +789,8 @@ public class Interpreter
 				e.reThrow( "Sourced file: "+sourceFileInfo );
             } catch (StaticModeException e) {
             	// pass this up.
+            	throw e;
+            } catch (RendererChangeException e) {
             	throw e;
             } catch ( Exception e) {
                 if ( true)
