@@ -54,16 +54,13 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 
 	public RehearseEditor(Base ibase, String path, int[] location) {
 		super(ibase, path, location);
-		this.setText("void setup() {} \n"
-				+ "void draw() {}");
 		getTextArea().getPainter().addCustomHighlight(new RehearseHighlight());
 
 		// TODO: I think this will need to be updated when we open a new document.
 		getTextArea().getDocument().addDocumentListener(new RehearseDocumentListener());
 	}
 
-	@Override
-	public void handleRun(boolean present) {
+	public void handleInteractiveRun() {
 
 		// clear previous context
 		if (canvasFrame != null)
