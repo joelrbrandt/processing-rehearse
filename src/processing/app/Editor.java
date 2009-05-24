@@ -176,7 +176,7 @@ public class Editor extends JFrame implements RunnerListener {
       toolbarMenu = new JMenu();
       base.rebuildToolbarMenu(toolbarMenu);
     }
-    toolbar = new RehearseEditorToolbar(this, toolbarMenu);
+    toolbar = newEditorToolbar(this, toolbarMenu);
     upper.add(toolbar);
 
     header = new EditorHeader(this);
@@ -316,6 +316,9 @@ public class Editor extends JFrame implements RunnerListener {
     //setVisible(true);
   }
 
+  protected EditorToolbar newEditorToolbar(Editor editor, JMenu menu) {
+	  return new EditorToolbar(editor, menu);
+  }
 
   protected void setPlacement(int[] location) {
     setBounds(location[0], location[1], location[2], location[3]);
