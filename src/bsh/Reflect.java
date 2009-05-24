@@ -36,6 +36,8 @@ package bsh;
 import java.lang.reflect.*;
 import java.util.Vector;
 
+import processing.core.PApplet.RendererChangeException;
+
 /**
  * All of the reflection API code lies here.  It is in the form of static
  * utilities.  Maybe this belongs in LHS.java or a generic object
@@ -145,6 +147,14 @@ class Reflect
 				+ StringUtil.methodString(
 					method.getName(), method.getParameterTypes() ) 
 				+ " in '" + method.getDeclaringClass() + "' :" + e );
+		} catch ( InvocationTargetException e) {
+			// TODO(bhsieh): generalize and generally unsuckify this.
+			// basically, we need some exceptions to get passed up past the interpreter level,
+			// so the Processing PApplet can catch them.
+			if (e.getCause() instanceof RendererChangeException) {
+				throw (RendererChangeException) e.getCause();
+			}
+			throw e;
 		}
 	}
 
