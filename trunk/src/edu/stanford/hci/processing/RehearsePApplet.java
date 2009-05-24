@@ -2,6 +2,8 @@ package edu.stanford.hci.processing;
 
 import java.awt.Image;
 
+import edu.stanford.hci.processing.editor.RehearseEditor;
+
 import bsh.EvalError;
 import bsh.Interpreter;
 import bsh.UtilEvalError;
