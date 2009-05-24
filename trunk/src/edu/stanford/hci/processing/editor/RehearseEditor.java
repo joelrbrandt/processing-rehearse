@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.swing.JFrame;
+import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.event.DocumentEvent;
@@ -34,6 +35,7 @@ import edu.stanford.hci.processing.RehearsePApplet;
 import edu.stanford.hci.processing.StaticModeException;
 import processing.app.Base;
 import processing.app.Editor;
+import processing.app.EditorToolbar;
 import processing.app.syntax.JEditTextArea;
 import processing.app.syntax.TextAreaPainter;
 import processing.app.syntax.TextAreaPainter.Highlight;
@@ -60,6 +62,11 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 		getTextArea().getDocument().addDocumentListener(new RehearseDocumentListener());
 	}
 
+	@Override
+	public EditorToolbar newEditorToolbar(Editor editor, JMenu menu) {
+		return new RehearseEditorToolbar(editor, menu);
+	}
+	
 	public void handleInteractiveRun() {
 
 		// clear previous context
