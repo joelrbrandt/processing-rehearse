@@ -46,13 +46,13 @@ public class EditorToolbar extends JComponent implements MouseInputListener {
   /** The amount of space between groups of buttons on the toolbar. */
   static final int BUTTON_GAP    = 5;
 
-  static final int RUN      = 0;
-  static final int STOP     = 1;
+  protected static final int RUN      = 0;
+  protected static final int STOP     = 1;
 
-  static final int NEW      = 2;
-  static final int OPEN     = 3;
-  static final int SAVE     = 4;
-  static final int EXPORT   = 5;
+  protected static final int NEW      = 2;
+  protected static final int OPEN     = 3;
+  protected static final int SAVE     = 4;
+  protected static final int EXPORT   = 5;
 
   static final int INACTIVE = 0;
   static final int ROLLOVER = 1;
@@ -89,6 +89,7 @@ public class EditorToolbar extends JComponent implements MouseInputListener {
   Font statusFont;
   Color statusColor;
 
+  public EditorToolbar() {}
 
   public EditorToolbar(Editor editor, JMenu menu) {
     this.editor = editor;

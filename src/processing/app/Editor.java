@@ -42,13 +42,15 @@ import javax.swing.event.*;
 import javax.swing.text.*;
 import javax.swing.undo.*;
 
+import edu.stanford.hci.processing.editor.RehearseEditorToolbar;
+
 
 /**
  * Main editor panel for the Processing Development Environment.
  */
 public class Editor extends JFrame implements RunnerListener {
 
-  Base base;
+  public Base base;
 
   // otherwise, if the window is resized with the message label
   // set to blank, it's preferredSize() will be fukered
@@ -174,7 +176,7 @@ public class Editor extends JFrame implements RunnerListener {
       toolbarMenu = new JMenu();
       base.rebuildToolbarMenu(toolbarMenu);
     }
-    toolbar = new EditorToolbar(this, toolbarMenu);
+    toolbar = new RehearseEditorToolbar(this, toolbarMenu);
     upper.add(toolbar);
 
     header = new EditorHeader(this);
