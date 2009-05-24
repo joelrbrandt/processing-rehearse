@@ -20,13 +20,13 @@ public class BSHConstructorCastExpression extends SimpleNode {
 		Object result = Primitive.NULL;
 		
 		BSHArguments a = getArgsNode();
-		System.out.println(a);
+		// System.out.println(a);
 
 		Object[] evaledArgs = new Object[a.children.length];
 		for (int i = 0; i < evaledArgs.length; ++i) {
 			if (a.children[i] instanceof SimpleNode) {
 				evaledArgs[i] = ((SimpleNode) a.children[i]).eval(callstack, interpreter);
-				System.out.println(evaledArgs[i]);
+				// System.out.println(evaledArgs[i]);
 			} else {
 				throw new EvalError("ConstructorCast Evaluation: Error evaluating argument " + (i+1), this, callstack);
 			}
@@ -67,6 +67,10 @@ public class BSHConstructorCastExpression extends SimpleNode {
 			throw new EvalError("ConstructorCast Evaluation: types of arguments did not match a parser", this, callstack);
 		}
 
+		// if we got a primitive object that's not wrapped in a Primitive, wrap it
+		// wrap just returns the object if the object isn't a Primitive
+		result = Primitive.wrap(result, result.getClass());
+		
 		return result;
 	}
 

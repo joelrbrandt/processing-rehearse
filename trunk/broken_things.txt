@@ -1,6 +1,6 @@
 1. Class defined later in the code is not recognized by beanshell.
 2. Examples:WaveGradient.pde....bad float unaryOperation error?
-3. Examples:RadialGradient.pde...Argument 1 of color constructor did not eval to a Primitive
+FIXED 3. Examples:RadialGradient.pde...Argument 1 of color constructor did not eval to a Primitive
 4. None of the load.. (e.g. loadImage) functions work. Perhaps because of file path issue? All files in the "data" folder must be available.
 5. Examples:Basic>Control>EmbeddedIteration.pde...Variable assignment: j: Can't assign float to int
 6. stop button doesn't work
