@@ -1,6 +1,9 @@
 package edu.stanford.hci.processing;
 
+import java.awt.Dimension;
 import java.awt.Image;
+
+import javax.swing.JFrame;
 
 import edu.stanford.hci.processing.editor.RehearseEditor;
 
@@ -20,6 +23,15 @@ public class RehearsePApplet extends PApplet {
 	
 	public void setInterpreter(Interpreter i) {
 		this.i = i;
+	}
+	
+	@Override
+	public void size(int width, int height) {
+		super.size(width, height);
+		((JFrame)frame).getContentPane().setPreferredSize(new Dimension(width, height));
+		((JFrame)frame).pack();
+		//super.size(width, height);
+		//((JFrame)frame).pack();
 	}
 	
 	@Override
