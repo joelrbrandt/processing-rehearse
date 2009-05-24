@@ -6,6 +6,8 @@ import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -31,6 +33,7 @@ import javax.swing.event.DocumentListener;
 import bsh.ConsoleInterface;
 import bsh.EvalError;
 import bsh.Interpreter;
+import bsh.This;
 import edu.stanford.hci.processing.RehearsePApplet;
 import edu.stanford.hci.processing.StaticModeException;
 import processing.app.Base;
@@ -80,6 +83,13 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 		canvasFrame.setSize(500, 500);
 
 		applet = new RehearsePApplet();
+		// This is to make size() work. Frame is resized when applet is.
+		applet.addComponentListener(new ComponentAdapter() {
+			public void componentResized(ComponentEvent e) {
+				canvasFrame.pack();
+			}
+		});
+		applet.sketchPath = getSketch().getFolder().getAbsolutePath();
 		canvasFrame.add(applet, BorderLayout.CENTER);
 		canvasFrame.setVisible(true);
 		canvasFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

@@ -128,7 +128,7 @@ public class ProcessingEditor extends JFrame implements ActionListener, ConsoleI
 		canvasFrame.setLayout(new BorderLayout());
 		canvasFrame.setSize(500, 500);
 		
-		applet = new RehearsePApplet();
+		//applet = new RehearsePApplet();
 		canvasFrame.add(applet, BorderLayout.CENTER);
 		canvasFrame.setVisible(true);
 		//ProcessingMethods methods = new ProcessingMethods(canvas);
