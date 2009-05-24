@@ -26,12 +26,11 @@ public class RehearsePApplet extends PApplet {
 	}
 	
 	@Override
-	public void size(int width, int height) {
-		super.size(width, height);
+	public void size(final int iwidth, final int iheight,
+            String irenderer, String ipath) {
+		super.size(iwidth, iheight, irenderer, ipath);
 		((JFrame)frame).getContentPane().setPreferredSize(new Dimension(width, height));
 		((JFrame)frame).pack();
-		//super.size(width, height);
-		//((JFrame)frame).pack();
 	}
 	
 	@Override

@@ -98,6 +98,7 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 		canvasFrame = new JFrame();
 		canvasFrame.setLayout(new BorderLayout());
 		canvasFrame.setSize(100, 100);
+		canvasFrame.setResizable(false);
 
 		applet = new RehearsePApplet();
 		//applet.setupFrameResizeListener();
