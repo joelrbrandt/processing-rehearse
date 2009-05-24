@@ -15,17 +15,20 @@ public class BSHColorMethodInvocation extends SimpleNode {
 		Primitive result = Primitive.NULL;
 
 		BSHArguments a = getArgsNode();
-		System.out.println(a);
+		// System.out.println(a);
 		Primitive[] p = new Primitive[a.children.length];
 		for (int i = 0; i < p.length; ++i) {
 			if (a.children[i] instanceof SimpleNode) {
 				Object o = ((SimpleNode) a.children[i]).eval(callstack, interpreter);
+				if (!(o instanceof Primitive)) {
+					o = Primitive.wrap(o, o.getClass()); // if o is a primitive type, this call will wrap it in a Primitive. Otherwise, it returns o
+				}
 				if (o instanceof Primitive) {
 					p[i] = (Primitive) o;
 				} else {
 					throw new EvalError("Argument " + (i+1) + " of color constructor did not eval to a Primitive", this, callstack);
 				}
-				System.out.println(o);
+				// System.out.println(o);
 			} else {
 				throw new EvalError("Error evaluating argument " + (i+1) + " of color constructor", this, callstack);
 			}
@@ -33,6 +36,8 @@ public class BSHColorMethodInvocation extends SimpleNode {
 
 		Class[] types = new Class[p.length];
 		Object[] values = new Object[p.length];
+		
+		
 		
 		for (int i = 0; i < p.length; ++i) {
 			types[i] = p[i].getType();
@@ -46,6 +51,30 @@ public class BSHColorMethodInvocation extends SimpleNode {
 		}
 
 
+		// for all the color constructors, either all params have to be a float or all params have to be an int
+		// so, if we've got both ints and floats, we want to convert them all to ints
+		
+		boolean hasInt = false;
+		boolean hasFloat = false;
+		boolean hasSomethingElse = false;
+		for (Class c : types) {
+			if (c.equals(Float.TYPE))
+				hasFloat = true;
+			else if (c.equals(Integer.TYPE))
+				hasInt = true;
+			else
+				hasSomethingElse = true;
+		}
+		
+		if (hasInt && hasFloat && !hasSomethingElse) {
+			for (int i = 0; i < p.length; ++i) {
+				if (types[i].equals(Integer.TYPE)) {
+					types[i] = Float.TYPE;
+					values[i] = (float) ((Integer) values[i]); //ugh
+				}
+			}			
+		}
+		
 		try {
 			Method m = this.getClass().getMethod("color", types);
 			if (m != null) {

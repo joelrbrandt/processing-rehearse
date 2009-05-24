@@ -879,12 +879,11 @@ public final class Primitive implements ParserConstants, java.io.Serializable
         	return ((Boolean)value).booleanValue() ? Primitive.TRUE :
         		Primitive.FALSE;
         
-		if ( type.isPrimitive() && isWrapperType( value.getClass() ) )
+		if ( type.isPrimitive() || isWrapperType( value.getClass() ) ) // Joel thinks there was a mistake here, used to say "type.isPrimitive() && isWrapperType( value.getClass() )"
 			return new Primitive( value );
 
 		return value;
     }
-
 
 	/**
 		Get the appropriate default value per JLS 4.5.4
