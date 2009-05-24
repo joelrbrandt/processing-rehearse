@@ -56,6 +56,7 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 	private Interpreter interpreter;
 
 	private ArrayList<Image> snapshots = new ArrayList<Image>();
+	private boolean wasLastRunInteractive = false;
 
 	public RehearseEditor(Base ibase, String path, int[] location) {
 		super(ibase, path, location);
@@ -70,8 +71,24 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 		return new RehearseEditorToolbar(editor, menu);
 	}
 	
+	@Override
+	public void handleRun(boolean present) {
+		wasLastRunInteractive = false;
+		super.handleRun(present);
+	}
+	
+	@Override
+	public void handleStop() {
+		if (wasLastRunInteractive) {
+			applet.stop();
+			canvasFrame.dispose();
+		} else {
+			super.handleStop();
+		}
+	}
+	
 	public void handleInteractiveRun() {
-
+		wasLastRunInteractive = true;
 		// clear previous context
 		if (canvasFrame != null)
 			canvasFrame.dispose();
@@ -83,12 +100,6 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 		canvasFrame.setSize(500, 500);
 
 		applet = new RehearsePApplet();
-		// This is to make size() work. Frame is resized when applet is.
-		applet.addComponentListener(new ComponentAdapter() {
-			public void componentResized(ComponentEvent e) {
-				canvasFrame.pack();
-			}
-		});
 		applet.sketchPath = getSketch().getFolder().getAbsolutePath();
 		canvasFrame.add(applet, BorderLayout.CENTER);
 		canvasFrame.setVisible(true);
