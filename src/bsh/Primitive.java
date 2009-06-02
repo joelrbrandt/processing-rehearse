@@ -887,7 +887,8 @@ public final class Primitive implements ParserConstants, java.io.Serializable
         	return ((Boolean)value).booleanValue() ? Primitive.TRUE :
         		Primitive.FALSE;
         
-		if ( type.isPrimitive() || isWrapperType( value.getClass() ) ) // Joel thinks there was a mistake here, used to say "type.isPrimitive() && isWrapperType( value.getClass() )"
+		if ( type.isPrimitive() && isWrapperType( value.getClass() ) ) // Joel thinks there was a mistake here, used to say "type.isPrimitive() && isWrapperType( value.getClass() )"
+																	   // Ben changed this back, it was causing a crash in object field access...
 			return new Primitive( value );
 
 		return value;
