@@ -165,6 +165,8 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 		}
 		 */
 
+		String source = appendCodeFromAllTabs();
+		
 		// now, add our script to the processing.core package
 		try {
 			interpreter.eval("package processing.core;");
@@ -175,7 +177,6 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 
 
 		//String source = super.getText();
-		String source = appendCodeFromAllTabs();
 //		ExecutionTask task = new ExecutionTask(interpreter, source, output);
 //		Thread thread = new Thread(task);
 //		thread.start();
