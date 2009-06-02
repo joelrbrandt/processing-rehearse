@@ -50,33 +50,29 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 	private RehearsePApplet applet;
 	private PrintStream outputStream;
 
-	private HashMap<Integer, Color> lineHighlights
-	= new HashMap<Integer, Color>();
-
 	private Interpreter interpreter;
 
 	private ArrayList<Image> snapshots = new ArrayList<Image>();
 	private boolean wasLastRunInteractive = false;
 
+	private RehearseLineModel lastExecutedLineModel = null;
+
 	public RehearseEditor(Base ibase, String path, int[] location) {
 		super(ibase, path, location);
 		getTextArea().getPainter().addCustomHighlight(new RehearseHighlight());
-
-		// TODO: I think this will need to be updated when we open a new document.
-		getTextArea().getDocument().addDocumentListener(new RehearseDocumentListener());
 	}
 
 	@Override
 	public EditorToolbar newEditorToolbar(Editor editor, JMenu menu) {
 		return new RehearseEditorToolbar(editor, menu);
 	}
-	
+
 	@Override
 	public void handleRun(boolean present) {
 		wasLastRunInteractive = false;
 		super.handleRun(present);
 	}
-	
+
 	@Override
 	public void handleStop() {
 		if (wasLastRunInteractive) {
@@ -86,7 +82,7 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 			super.handleStop();
 		}
 	}
-	
+
 	public void handleInteractiveRun() {
 		wasLastRunInteractive = true;
 		// clear previous context
@@ -143,7 +139,7 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 				}
 			}
 		}
-		*/
+		 */
 
 		// now, add our script to the processing.core package
 		try {
@@ -160,7 +156,8 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 //		thread.start();
 
 		console.clear();
-		lineHighlights.clear();
+		clearExecutionInfoForLines();
+		//lineHighlights.clear();
 		snapshots.clear();
 		getTextArea().repaint();
 		try {
@@ -210,25 +207,40 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 		System.out.println(o.toString());
 	}
 
-	public void notifyLineExecution() {
-		int line = interpreter.getLastExecutedLine();
-		
-		for (Map.Entry<Integer, Color> entry : lineHighlights.entrySet()) {
-//			Color c = entry.getValue();
-//			int green = c.getGreen() + (256 - c.getGreen()) / 100;
-//			entry.setValue(new Color(c.getRed(), c.getBlue(), green));
-			entry.setValue(Color.YELLOW);
+	private void clearExecutionInfoForLines() {
+		for (int line = 0; line < getTextArea().getTokenMarker().getLineCount(); line++) {
+			RehearseLineModel m = 
+				(RehearseLineModel)getTextArea().getTokenMarker().getLineModelAt(line);
+			if (m != null) {
+				m.executedInLastRun = false;
+				m.isMostRecentlyExecuted = false;
+			}
 		}
-		
-		lineHighlights.put(line, Color.GREEN);
-		getTextArea().repaint();
+	}
+
+	public void notifyLineExecution() {
+		if (lastExecutedLineModel != null)
+			lastExecutedLineModel.isMostRecentlyExecuted = false;
 
 		// snapshotPoints is zero-indexed, interpreter is one-indexed.
+		int line = interpreter.getLastExecutedLine() - 1;
 		RehearseLineModel m = 
-			(RehearseLineModel)getTextArea().getTokenMarker().getLineModelAt(line - 1);
-		if (m != null && m.isPrintPoint) {
+			(RehearseLineModel)getTextArea().getTokenMarker().getLineModelAt(line);
+		if (m == null) {
+			m = new RehearseLineModel();
+			getTextArea().getTokenMarker().setLineModelAt(line, m);
+		}
+
+		m.executedInLastRun = true;
+		m.isMostRecentlyExecuted = true;
+
+		getTextArea().repaint();
+		
+		if (m.isPrintPoint) {
 			snapshots.add(applet.get().getImage());
 		}
+
+		lastExecutedLineModel = m;
 	}
 
 	public class TextAreaOutputStream extends OutputStream {
@@ -255,7 +267,17 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 
 		public void paintHighlight(Graphics gfx, int line, int y) {
 			// Interpreter uses one-offset, processing uses zero-offset.
-			Color c = lineHighlights.get(line + 1);
+			Color c = null;
+			RehearseLineModel m = 
+				(RehearseLineModel)getTextArea().getTokenMarker().getLineModelAt(line);
+			if (m != null) {
+				if (m.executedInLastRun)
+					c = Color.yellow;
+				if (m.isMostRecentlyExecuted)
+					c = Color.green;
+			}
+
+			//Color c = lineHighlights.get(line + 1);
 			if (c != null) {
 				FontMetrics fm = textarea.getPainter().getFontMetrics();
 				int height = fm.getHeight();
@@ -270,23 +292,22 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 		}
 	}
 
-	// TODO: it'd be better if it didn't just clear but instead
-	// moved the line annotations around.
-	class RehearseDocumentListener implements DocumentListener {
-		public void changedUpdate(DocumentEvent e) {
-			lineHighlights.clear();
-			getTextArea().repaint();
-		}
+	
+//	class RehearseDocumentListener implements DocumentListener {
+//	public void changedUpdate(DocumentEvent e) {
+//	lineHighlights.clear();
+//	getTextArea().repaint();
+//	}
 
-		public void insertUpdate(DocumentEvent e) {
-			lineHighlights.clear();
-			getTextArea().repaint();
-		}
+//	public void insertUpdate(DocumentEvent e) {
+//	lineHighlights.clear();
+//	getTextArea().repaint();
+//	}
 
-		public void removeUpdate(DocumentEvent e) {
-			lineHighlights.clear();
-			getTextArea().repaint();
-		}
+//	public void removeUpdate(DocumentEvent e) {
+//	lineHighlights.clear();
+//	getTextArea().repaint();
+//	}
 
-	}
+//	}
 }
