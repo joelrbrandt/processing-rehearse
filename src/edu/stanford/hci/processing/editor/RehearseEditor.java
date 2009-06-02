@@ -2,12 +2,9 @@ package edu.stanford.hci.processing.editor;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -16,36 +13,27 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.Reader;
 import java.io.StringReader;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 
-import bsh.ConsoleInterface;
-import bsh.EvalError;
-import bsh.Interpreter;
-import bsh.This;
-import edu.stanford.hci.processing.RehearsePApplet;
-import edu.stanford.hci.processing.StaticModeException;
 import processing.app.Base;
 import processing.app.Editor;
 import processing.app.EditorToolbar;
+import processing.app.SketchCode;
 import processing.app.syntax.JEditTextArea;
+import processing.app.syntax.SyntaxDocument;
 import processing.app.syntax.TextAreaPainter;
 import processing.app.syntax.TextAreaPainter.Highlight;
-import processing.core.PApplet;
+import bsh.ConsoleInterface;
+import bsh.EvalError;
+import bsh.Interpreter;
+import edu.stanford.hci.processing.RehearsePApplet;
+import edu.stanford.hci.processing.StaticModeException;
 
 public class RehearseEditor extends Editor implements ConsoleInterface {
-
+	
 	private JFrame canvasFrame;
 	private RehearsePApplet applet;
 	private PrintStream outputStream;
@@ -81,6 +69,42 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 		} else {
 			super.handleStop();
 		}
+	}
+	
+	private String appendCodeFromAllTabs() {
+		StringBuffer bigCode = new StringBuffer();
+		int bigCount = 0;
+		for (SketchCode sc : getSketch().getCode()) {
+			sc.setPreprocOffset(bigCount);
+			if (sc == getSketch().getCurrentCode()) {
+				bigCode.append(getText());
+		        bigCode.append('\n');
+		        bigCount += getLineCount();
+			} else {
+				bigCode.append(sc.getProgram());
+		        bigCode.append('\n');
+		        bigCount += sc.getLineCount();
+			}
+		}
+		
+		return bigCode.toString();
+	}
+	
+	private SketchCode lineToSketchCode(int line) {
+		for (SketchCode sc : getSketch().getCode()) {
+			int lineCount;
+			if (sc == getSketch().getCurrentCode()) {
+				lineCount = getLineCount();
+			} else {
+				lineCount = sc.getLineCount();
+			}
+			
+			if (line >= sc.getPreprocOffset() && line < sc.getPreprocOffset() + lineCount) {
+				return sc;
+			}
+		}
+		
+		return null;
 	}
 
 	public void handleInteractiveRun() {
@@ -150,12 +174,14 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 		}
 
 
-		String source = super.getText();
+		//String source = super.getText();
+		String source = appendCodeFromAllTabs();
 //		ExecutionTask task = new ExecutionTask(interpreter, source, output);
 //		Thread thread = new Thread(task);
 //		thread.start();
 
 		console.clear();
+		ensureDocumentExistsForEveryTab();
 		clearExecutionInfoForLines();
 		//lineHighlights.clear();
 		snapshots.clear();
@@ -206,15 +232,34 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 		//getOut().append(o.toString() + "\n");	
 		System.out.println(o.toString());
 	}
+	
+	private void ensureDocumentExistsForEveryTab() {
+		SketchCode currentCode = getSketch().getCurrentCode();
+		for (SketchCode sc : getSketch().getCode()) {
+			SyntaxDocument doc = (SyntaxDocument)sc.getDocument();
+			if (doc == null) {
+				// This code makes the document and associates it with the
+				// SketchCode object, performing appropriate initialization steps.
+				// This isn't ideal but now we need each tab to have a valid
+				// document reference even if that tab hasn't been clicked on yet.
+				setCode(sc);
+			}
+		}
+		// Set the code back to the one we started.
+		setCode(currentCode);
+	}
 
 	private void clearExecutionInfoForLines() {
-		for (int line = 0; line < getTextArea().getTokenMarker().getLineCount(); line++) {
-			RehearseLineModel m = 
-				(RehearseLineModel)getTextArea().getTokenMarker().getLineModelAt(line);
-			if (m != null) {
-				m.executedInLastRun = false;
-				m.isMostRecentlyExecuted = false;
-			}
+		for (SketchCode sc : getSketch().getCode()) {
+			SyntaxDocument doc = (SyntaxDocument)sc.getDocument();
+				for (int line = 0; line < doc.getTokenMarker().getLineCount(); line++) {
+					RehearseLineModel m = 
+						(RehearseLineModel)doc.getTokenMarker().getLineModelAt(line);
+					if (m != null) {
+						m.executedInLastRun = false;
+						m.isMostRecentlyExecuted = false;
+					}
+				}
 		}
 	}
 
@@ -224,11 +269,15 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 
 		// snapshotPoints is zero-indexed, interpreter is one-indexed.
 		int line = interpreter.getLastExecutedLine() - 1;
+		
+		SketchCode sc = lineToSketchCode(line);
+		SyntaxDocument doc = (SyntaxDocument)sc.getDocument();
+		
 		RehearseLineModel m = 
-			(RehearseLineModel)getTextArea().getTokenMarker().getLineModelAt(line);
+			(RehearseLineModel)doc.getTokenMarker().getLineModelAt(line - sc.getPreprocOffset());
 		if (m == null) {
 			m = new RehearseLineModel();
-			getTextArea().getTokenMarker().setLineModelAt(line, m);
+			doc.getTokenMarker().setLineModelAt(line - sc.getPreprocOffset(), m);
 		}
 
 		m.executedInLastRun = true;

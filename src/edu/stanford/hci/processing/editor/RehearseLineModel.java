@@ -2,7 +2,8 @@ package edu.stanford.hci.processing.editor;
 
 /**
  * A class that encapsulates all data associated with one line in the
- * editor. 
+ * editor. This means that when lines are added, removed, etc. the right
+ * data stays with each line.
  * 
  * @author William Choi
  *
