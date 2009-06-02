@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 
+import edu.stanford.hci.processing.RehearsePApplet;
+import edu.stanford.hci.processing.ModeException;
 import processing.app.Base;
 import processing.app.Editor;
 import processing.app.EditorToolbar;
@@ -29,8 +31,6 @@ import processing.app.syntax.TextAreaPainter.Highlight;
 import bsh.ConsoleInterface;
 import bsh.EvalError;
 import bsh.Interpreter;
-import edu.stanford.hci.processing.RehearsePApplet;
-import edu.stanford.hci.processing.StaticModeException;
 
 public class RehearseEditor extends Editor implements ConsoleInterface {
 	
@@ -190,11 +190,15 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 			Object obj;
 			try {
 				obj = interpreter.eval(source, true);
-			} catch (StaticModeException e) {
-				// Code was written in static mode, let's try again.
-				System.out.println("Code written in static mode, wrapping and restarting.");
-				// this is kind of gross...
-				obj = interpreter.eval("setup() {" + source + "}");
+			} catch (ModeException e) {
+				if (e.isJavaMode()) {
+					throw new RuntimeException("We don't do java mode yet!");
+				} else {
+					// Code was written in static mode, let's try again.
+					System.out.println("Code written in static mode, wrapping and restarting.");
+					// this is kind of gross...
+					obj = interpreter.eval("setup() {" + source + "}");
+				}
 			}
 			// This actually starts the program.
 			applet.init();
