@@ -21,6 +21,21 @@ public class BeanShellTester {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		Bar b = new Bar();
+		Foo f = new Foo();
+		Foo.b = b;
+		
+	}
+	
+	static class Foo {
+		static Bar b;
 	}
 
+	static class Bar {
+		static Foo f;
+	}
 }
+
+
+

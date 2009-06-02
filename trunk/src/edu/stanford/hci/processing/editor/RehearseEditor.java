@@ -45,6 +45,8 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 
 	private RehearseLineModel lastExecutedLineModel = null;
 
+	public int linesExecutedCount = 0; // TODO: refactor all this crap also this will overflow
+	
 	public RehearseEditor(Base ibase, String path, int[] location) {
 		super(ibase, path, location);
 		getTextArea().getPainter().addCustomHighlight(new RehearseHighlight());
@@ -269,6 +271,8 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 	}
 
 	public void notifyLineExecution() {
+		linesExecutedCount++;
+		
 		if (lastExecutedLineModel != null)
 			lastExecutedLineModel.isMostRecentlyExecuted = false;
 
@@ -285,9 +289,11 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 			doc.getTokenMarker().setLineModelAt(line - sc.getPreprocOffset(), m);
 		}
 
+		
 		m.executedInLastRun = true;
 		m.isMostRecentlyExecuted = true;
-
+		m.countAtLastExec = linesExecutedCount;
+		
 		getTextArea().repaint();
 		
 		if (m.isPrintPoint) {
@@ -325,10 +331,16 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 			RehearseLineModel m = 
 				(RehearseLineModel)getTextArea().getTokenMarker().getLineModelAt(line);
 			if (m != null) {
+				/*
 				if (m.executedInLastRun)
 					c = Color.yellow;
 				if (m.isMostRecentlyExecuted)
 					c = Color.green;
+				*/
+				
+				int i = Math.min(linesExecutedCount - m.countAtLastExec, 150);
+				// c = new Color(i,255,i);
+				c = new Color(78,127,78,200-i);
 			}
 
 			//Color c = lineHighlights.get(line + 1);

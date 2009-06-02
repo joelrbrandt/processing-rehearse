@@ -14,6 +14,8 @@ public class RehearseLineModel {
 	public boolean executedInLastRun;
 	public boolean isMostRecentlyExecuted;
 	
+	public int countAtLastExec;
+	
 	public RehearseLineModel() {
 		isPrintPoint = false;
 		executedInLastRun = false;
