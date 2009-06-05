@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.Vector;
 import java.awt.Canvas;
 import java.awt.Point;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -1594,7 +1595,7 @@ implements Runnable, ConsoleInterface,Serializable
 
 	public SnapshotModel makeSnapshotModel() {
 		SnapshotModel sm = new SnapshotModel();
-		sm.setImage(applet.get().getImage());
+		sm.setImage((BufferedImage) applet.get().getImage());
 		
 		// our consumers usually want zero-indexed
 		sm.setLineNum(lastExecutedLine - 1);
