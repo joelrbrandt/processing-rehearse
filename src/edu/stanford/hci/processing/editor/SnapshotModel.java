@@ -7,11 +7,11 @@ import java.util.Map;
 public class SnapshotModel {
 
 	private Image image;
-	private Map<String, Object> variableMap;
+	private Map<String, String> variableMap;
 	private int lineNum;
 	
 	public SnapshotModel() {
-		variableMap = new HashMap<String, Object>();
+		variableMap = new HashMap<String, String>();
 	}
 	
 	public Image getImage() {
@@ -20,11 +20,11 @@ public class SnapshotModel {
 	public void setImage(Image image) {
 		this.image = image;
 	}
-	public Map<String, Object> getVariableMap() {
+	public Map<String, String> getVariableMap() {
 		return variableMap;
 	}
 	
-	public void setVariableMap(Map<String, Object> variableMap) {
+	public void setVariableMap(Map<String, String> variableMap) {
 		this.variableMap = variableMap;
 	}
 	public int getLineNum() {

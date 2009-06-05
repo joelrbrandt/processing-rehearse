@@ -53,6 +53,7 @@ import processing.core.PApplet.RendererChangeException;
 import edu.stanford.hci.processing.RehearsePApplet;
 import edu.stanford.hci.processing.ModeException;
 import edu.stanford.hci.processing.editor.RehearseEditor;
+import edu.stanford.hci.processing.editor.SnapshotModel;
 
 /**
 	The BeanShell script interpreter.
@@ -173,6 +174,7 @@ implements Runnable, ConsoleInterface,Serializable
 	private HashSet<Integer> breakpointLineNumbers = new HashSet<Integer>();
 	private Object breakpointLock = new Object();
 	private int lastExecutedLine = -1;
+	private CallStack lastUsedCallStack = null;
 
 	private boolean suspended = false;
 
@@ -1573,8 +1575,9 @@ implements Runnable, ConsoleInterface,Serializable
 	}
 
 	// TODO: check source?
-	public void doLog(int line) {
+	public void doLog(int line, CallStack cs) {
 		lineNumbers.put(lastExecutedLine, new Date());
+		lastUsedCallStack = cs;
 		if (lastExecutedLine == line) {
 			// nothing to see here, just exit.
 			return;
@@ -1582,13 +1585,30 @@ implements Runnable, ConsoleInterface,Serializable
 
 		lastExecutedLine = line;
 		if (editor != null) { // TODO: figure out why this is null sometimes
-			editor.notifyLineExecution();
+			editor.notifyLineExecution(line);
 		} else {
 			// commented this out, is killing my debugging.
 			//System.out.println("Editor was null, Ben thinks that is whack.");
 		}
 	}
 
+	public SnapshotModel makeSnapshotModel() {
+		SnapshotModel sm = new SnapshotModel();
+		sm.setImage(applet.get().getImage());
+		
+		// our consumers usually want zero-indexed
+		sm.setLineNum(lastExecutedLine - 1);
+		List<Variable[]> variables = lastUsedCallStack.top().getDeclaredVariablesRecursive();
+		HashMap<String, String> variableMap = new HashMap<String, String>();
+		for (Variable[] varArray : variables) {
+			for (Variable var : varArray) {
+				variableMap.put(var.name, var.value.toString());
+			}
+		} 
+		sm.setVariableMap(variableMap);
+		return sm;
+	}
+	
 	public RehearsePApplet getApplet() {
 		return applet;
 	}

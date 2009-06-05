@@ -14,6 +14,9 @@ import java.io.PrintStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -28,6 +31,7 @@ import processing.app.syntax.JEditTextArea;
 import processing.app.syntax.SyntaxDocument;
 import processing.app.syntax.TextAreaPainter;
 import processing.app.syntax.TextAreaPainter.Highlight;
+import bsh.CallStack;
 import bsh.ConsoleInterface;
 import bsh.EvalError;
 import bsh.Interpreter;
@@ -40,7 +44,8 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 
 	private Interpreter interpreter;
 
-	private ArrayList<Image> snapshots = new ArrayList<Image>();
+	private ArrayList<SnapshotModel> snapshots = new ArrayList<SnapshotModel>();
+
 	private boolean wasLastRunInteractive = false;
 
 	private RehearseLineModel lastExecutedLineModel = null;
@@ -133,8 +138,12 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 			public void windowClosing(WindowEvent e) {
 				applet.stop();
 				if (snapshots.size() > 0) {
-					RehearseImageViewer viewer = new RehearseImageViewer(snapshots);
-					viewer.setVisible(true);
+					Map<String, String> map  = snapshots.get(0).getVariableMap();
+					for (Entry<String, String> entry : map.entrySet()) {
+						System.out.println(entry.getKey() + " $$$ " + entry.getValue());
+					}
+					//RehearseImageViewer viewer = new RehearseImageViewer(snapshots);
+					//viewer.setVisible(true);
 				}
 			}
 		});
@@ -270,14 +279,14 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 		}
 	}
 
-	public void notifyLineExecution() {
+	public void notifyLineExecution(int lineNumber) {
 		linesExecutedCount++;
 		
 		if (lastExecutedLineModel != null)
 			lastExecutedLineModel.isMostRecentlyExecuted = false;
 
 		// snapshotPoints is zero-indexed, interpreter is one-indexed.
-		int line = interpreter.getLastExecutedLine() - 1;
+		int line = lineNumber - 1;
 		
 		SketchCode sc = lineToSketchCode(line);
 		SyntaxDocument doc = (SyntaxDocument)sc.getDocument();
@@ -297,7 +306,7 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 		getTextArea().repaint();
 		
 		if (m.isPrintPoint) {
-			snapshots.add(applet.get().getImage());
+			snapshots.add(interpreter.makeSnapshotModel());
 		}
 
 		lastExecutedLineModel = m;

@@ -170,7 +170,7 @@ class SimpleNode implements Node
 		// TODO: Technically there is a possibility for concurrency issues
 		// if the user hits the Resume button somewhere here.
 		
-		interpreter.doLog(getLineNumber());
+		interpreter.doLog(getLineNumber(), callstack);
 		synchronized(interpreter.getBreakpointLock()) {
 			try {
 				while (interpreter.isSuspended()) {
