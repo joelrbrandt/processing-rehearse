@@ -806,7 +806,20 @@ public class NameSpace
 			vars[i++] = (Variable)e.nextElement();
 		return vars;
 	}
-
+	
+	// Get variables declared in this namespace or in parent namespaces.
+	// List is in ascending (this first, then parent, etc) order.
+	public ArrayList<Variable[]> getDeclaredVariablesRecursive()
+	{
+		ArrayList<Variable[]> variables = new ArrayList<Variable[]>();
+		NameSpace ns = this;
+		while (ns != null) {
+			variables.add(ns.getDeclaredVariables());
+			ns = ns.getParent();
+		}
+		return variables;
+	}
+	
 	/**
 		Unwrap a variable to its value.
 		@return return the variable value.  A null var is mapped to 
