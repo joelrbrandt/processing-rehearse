@@ -138,12 +138,8 @@ public class RehearseEditor extends Editor implements ConsoleInterface {
 			public void windowClosing(WindowEvent e) {
 				applet.stop();
 				if (snapshots.size() > 0) {
-					Map<String, String> map  = snapshots.get(0).getVariableMap();
-					for (Entry<String, String> entry : map.entrySet()) {
-						System.out.println(entry.getKey() + " $$$ " + entry.getValue());
-					}
-					//RehearseImageViewer viewer = new RehearseImageViewer(snapshots);
-					//viewer.setVisible(true);
+					RehearseImageViewer viewer = new RehearseImageViewer(snapshots);
+					viewer.setVisible(true);
 				}
 			}
 		});
