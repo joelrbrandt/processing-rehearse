@@ -4,12 +4,15 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
@@ -18,90 +21,84 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.AbstractTableModel;
 
-public class RehearseImageViewer extends JFrame implements ChangeListener {
+public class RehearseImageViewer extends JFrame implements ChangeListener, ActionListener {
 	private List<SnapshotModel> snapshots;
-	int currImage = 0;
-	JButton next;
-	JButton previous;
-	JPanel viewer;
-
+	private int currSnapshotIndex;
+	
+	private JLabel snapshotNumLabel;
+	private JButton next;
+	private JButton previous;
 	private JSlider snapshotSlider;
 	private JTable variableTable;
 	private SnapshotImageViewer imageViewer;
 
 	public RehearseImageViewer(List<SnapshotModel> snapshots) {
-		super();
+		super("Snapshots");
 		setSize(750, 600);
 		this.snapshots = snapshots;
+		currSnapshotIndex = 0;
 		getContentPane().setLayout(new BorderLayout());
-
+		
 		snapshotSlider = new JSlider(JSlider.HORIZONTAL, 0, snapshots.size() - 1, 0);
-		snapshotSlider.setPreferredSize(new Dimension(700, 100));
+		snapshotSlider.setPreferredSize(new Dimension(500, 50));
 		snapshotSlider.setMajorTickSpacing(1);
 		snapshotSlider.setPaintTicks(true);
 		snapshotSlider.setSnapToTicks(true);
 		snapshotSlider.addChangeListener(this);
-		add(snapshotSlider, BorderLayout.PAGE_START);
+		
+		previous = new JButton("Prev");
+		previous.addActionListener(this);
+		next = new JButton("Next");
+		next.addActionListener(this);
 
+		JPanel headerPanel = new JPanel();
+		snapshotNumLabel = new JLabel("Snapshot 1");
+		headerPanel.add(snapshotNumLabel);
+		headerPanel.add(snapshotSlider);
+		headerPanel.add(previous);
+		headerPanel.add(next);
+		add(headerPanel, BorderLayout.PAGE_START);
+		
 		variableTable = new JTable(new VariableTableModel(snapshots.get(0)));
-		variableTable.setPreferredSize(new Dimension(200,500));
 		JScrollPane scrollPane = new JScrollPane(variableTable);
+		scrollPane.setPreferredSize(new Dimension(300,500));
 		variableTable.setFillsViewportHeight(true);
 		add(scrollPane, BorderLayout.LINE_END);
 
 		imageViewer = new SnapshotImageViewer(snapshots.get(0).getImage());
-		add(imageViewer, BorderLayout.CENTER);
 		imageViewer.setPreferredSize(new Dimension(500,500));
+		add(imageViewer, BorderLayout.CENTER);
 
-		/*
-		viewer = new JPanel() {
-			public void paint(Graphics g) {
-				BufferedImage i = (BufferedImage) imageList.get(currImage);
-				g.drawImage(i, 0, 0, i.getHeight(null), 
-						i.getWidth(null), null);
-			}
-		};
-		viewer.setSize(500, 500);
+		manageButtonStates();
+	}
+	
+	private void manageButtonStates() {
+		previous.setEnabled(!(currSnapshotIndex == 0));
+		next.setEnabled(!(currSnapshotIndex == snapshots.size() - 1));
+	}
 
-		getContentPane().add(viewer, BorderLayout.CENTER);
-
-
-		JPanel buttonPanel = new JPanel();
-		next = new JButton("Next");
-		next.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				currImage++;
-				if (currImage >= imageList.size()) {
-					currImage = 0;
-				}
-				repaint();
-			}
-		});
-		previous = new JButton("Previous");
-		previous.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				currImage--;
-				if (currImage < 0) {
-					currImage = imageList.size() - 1;
-				}
-				repaint();
-			}
-		});
-		buttonPanel.add(previous);
-		buttonPanel.add(next);
-		getContentPane().add(buttonPanel, BorderLayout.SOUTH);
-		 */
+	public void actionPerformed(ActionEvent e) {
+		if (e.getSource() == previous) {
+			//setCurrentSnapshot(currSnapshotIndex - 1);
+			snapshotSlider.setValue(currSnapshotIndex - 1);
+			manageButtonStates();
+		} else if (e.getSource() == next) {
+			//setCurrentSnapshot(currSnapshotIndex + 1);
+			snapshotSlider.setValue(currSnapshotIndex + 1);
+			manageButtonStates();
+		}
 	}
 
 	public void stateChanged(ChangeEvent e) {
 		JSlider source = (JSlider)e.getSource();
-		if (!source.getValueIsAdjusting()) {
-			int snapshotIndex = (int)source.getValue();
-			setCurrentSnapshot(snapshotIndex);
-		}
+		int snapshotIndex = (int)source.getValue();
+		setCurrentSnapshot(snapshotIndex);
+		manageButtonStates();
 	}
 
 	private void setCurrentSnapshot(int snapshotIndex) {
+		currSnapshotIndex = snapshotIndex;
+		snapshotNumLabel.setText("Snapshot " + (currSnapshotIndex+1));
 		SnapshotModel snapshot = snapshots.get(snapshotIndex);
 		imageViewer.setImage(snapshot.getImage());
 		variableTable.setModel(new VariableTableModel(snapshot));
@@ -122,8 +119,12 @@ public class RehearseImageViewer extends JFrame implements ChangeListener {
 
 		public void paint(Graphics g) {
 			BufferedImage i = (BufferedImage)image;
-			g.drawImage(i, 0, 0, i.getHeight(null), 
-					i.getWidth(null), null);
+			
+			int x = this.getWidth() / 2 - i.getHeight(null) / 2;
+			int y = this.getHeight() / 2 - i.getHeight(null) / 2;
+			
+			g.drawImage(i, x, y, i.getWidth(null), 
+					i.getHeight(null), null);
 		}
 	}
 
